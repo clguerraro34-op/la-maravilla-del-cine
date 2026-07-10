@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Séptimo Arte — César Luis Guerra Romero</title>
+<meta name="description" content="Un viaje por la importancia del cine en la historia y el entretenimiento. Por César Luis Guerra Romero.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0606;
+    --bg: #14090b;
+    --bg-elevated: #1c1013;
+    --bg-card: #1a0e11;
+    --gold: #d4a24c;
+    --gold-bright: #f4c969;
+    --gold-dim: #8b6b2e;
+    --crimson: #8b0a1a;
+    --crimson-bright: #c41e2e;
+    --crimson-deep: #4a050d;
+    --cream: #f5e9d3;
+    --cream-dim: #c9b89a;
+    --muted: #8a7a6b;
+    --border: rgba(212, 162, 76, 0.18);
+    --border-bright: rgba(212, 162, 76, 0.4);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Manrope', sans-serif;
+    background: var(--bg-deep);
+    color: var(--cream);
+    overflow-x: hidden;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    padding-top: 28px;
+  }
+
+  ::selection { background: var(--gold); color: var(--bg-deep); }
+
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 5px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+
+  /* Grano de película global */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: overlay;
+  }
+
+  /* Cinta de película superior */
+  .film-strip-top {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 28px;
+    background: #050303;
+    z-index: 90;
+    border-bottom: 1px solid var(--border);
+  }
+  .film-strip-top::before,
+  .film-strip-top::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    height: 6px;
+    background-image: radial-gradient(circle, var(--cream) 1.8px, transparent 2.2px);
+    background-size: 14px 6px;
+    background-repeat: repeat-x;
+    background-position: 0 center;
+  }
+  .film-strip-top::before { top: 5px; }
+  .film-strip-top::after { bottom: 5px; }
+
+  /* Cortinas de apertura */
+  .curtain {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 50.5%;
+    background:
+      repeating-linear-gradient(to right,
+        #4a050d 0, #8b0a1a 18px, #6a0813 38px, #8b0a1a 58px, #4a050d 78px),
+      linear-gradient(to right, #2a0307, #5a0510);
+    z-index: 200;
+    transition: transform 1.8s cubic-bezier(0.76, 0, 0.24, 1) 0.4s;
+    box-shadow: 0 0 60px rgba(0,0,0,0.9);
+  }
+  .curtain.left { left: 0; }
+  .curtain.right { right: 0; }
+  body.loaded .curtain.left { transform: translateX(-100%); }
+  body.loaded .curtain.right { transform: translateX(100%); }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem 5rem;
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 70% 60% at var(--mx, 50%) var(--my, 50%), rgba(244, 201, 105, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 80% at 50% 100%, rgba(139, 10, 26, 0.45) 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg-deep) 0%, #1a0810 100%);
+  }
+
+  #dust-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 1100px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.4em;
+    font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 0.8s forwards;
+  }
+
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(3.5rem, 12vw, 9.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+    color: var(--cream);
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1.2s ease 1.1s forwards;
+  }
+  .hero-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--gold-bright);
+    display: inline-block;
+    position: relative;
+  }
+  .hero-title em::after {
+    content: '';
+    position: absolute;
+    bottom: 0.08em;
+    left: 0; right: 0;
+    height: 4px;
+    background: var(--crimson-bright);
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: lineGrow 1s ease 2s forwards;
+  }
+
+  .hero-subtitle {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+    color: var(--cream-dim);
+    max-width: 700px;
+    margin: 0 auto 2.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.5s forwards;
+  }
+
+  .hero-meta {
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    opacity: 0;
+    animation: fadeUp 1s ease 1.8s forwards;
+  }
+  .hero-meta .dot { color: var(--gold); }
+  .hero-meta strong { color: var(--cream); font-weight: 500; }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--gold);
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    text-decoration: none;
+    opacity: 0;
+    animation: fadeUp 1s ease 2.2s forwards;
+  }
+  .scroll-indicator i { animation: bounceDown 2s ease-in-out infinite; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes lineGrow { to { transform: scaleX(1); } }
+  @keyframes bounceDown {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+
+  /* SECCIONES */
+  .section {
+    padding: 7rem 2rem;
+    position: relative;
+  }
+  .container { max-width: 1200px; margin: 0 auto; }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+  .section-label {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.4em;
+    font-size: 0.85rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    display: inline-block;
+    padding: 0.4rem 1.2rem;
+    border: 1px solid var(--border-bright);
+    border-radius: 100px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 1rem;
+  }
+  .section-title em {
+    font-style: italic;
+    font-weight: 400;
+    color: var(--gold-bright);
+  }
+  .section-subtitle {
+    font-size: 1.1rem;
+    color: var(--cream-dim);
+    max-width: 700px;
+    margin: 0 auto;
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* INTRO */
+  .intro {
+    background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 100%);
+  }
+  .intro-text {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    font-size: 1.15rem;
+    line-height: 1.85;
+    color: var(--cream-dim);
+  }
+  .intro-text p + p { margin-top: 1.5rem; }
+  .intro-text strong { color: var(--cream); font-weight: 500; }
+
+  .intro-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    text-align: center;
+    color: var(--gold-bright);
+    margin: 4rem auto 1rem;
+    max-width: 900px;
+    line-height: 1.4;
+    position: relative;
+    padding: 2rem 1rem;
+  }
+  .intro-quote::before,
+  .intro-quote::after {
+    content: '"';
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    color: var(--crimson-bright);
+    position: absolute;
+    opacity: 0.6;
+    line-height: 1;
+  }
+  .intro-quote::before { top: -0.5rem; left: -0.5rem; }
+  .intro-quote::after { bottom: -2.5rem; right: -0.5rem; }
+  .intro-quote-author {
+    text-align: center;
+    font-size: 0.85rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  /* TIMELINE */
+  .timeline-section {
+    background: var(--bg);
+    position: relative;
+  }
+  .timeline-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+  .timeline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+  .timeline-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 2rem;
+    position: relative;
+    transition: all 0.4s ease;
+    overflow: hidden;
+  }
+  .timeline-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px;
+    height: 0;
+    background: linear-gradient(to bottom, var(--gold-bright), var(--crimson-bright));
+    transition: height 0.5s ease;
+  }
+  .timeline-card:hover::before { height: 100%; }
+  .timeline-card:hover {
+    transform: translateY(-6px);
+    border-color: var(--border-bright);
+    background: var(--bg-elevated);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  }
+  .timeline-year {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: var(--gold-bright);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.05em;
+  }
+  .timeline-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 1rem;
+  }
+  .timeline-desc {
+    font-size: 0.95rem;
+    color: var(--cream-dim);
+    line-height: 1.6;
+  }
+  .timeline-icon {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 1.4rem;
+    color: var(--gold-dim);
+    opacity: 0.5;
+    transition: all 0.4s ease;
+  }
+  .timeline-card:hover .timeline-icon {
+    color: var(--gold-bright);
+    opacity: 1;
+    transform: rotate(-10deg) scale(1.1);
+  }
+
+  /* IMPORTANCIA */
+  .importance-section {
+    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
+  }
+  .importance-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  .importance-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 2.5rem 2rem;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .importance-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top right, rgba(212, 162, 76, 0.08), transparent 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .importance-card:hover::after { opacity: 1; }
+  .importance-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-bright);
+  }
+  .importance-number {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: var(--gold);
+    margin-bottom: 1rem;
+    letter-spacing: 0.1em;
+  }
+  .importance-icon {
+    font-size: 2rem;
+    color: var(--gold-bright);
+    margin-bottom: 1.5rem;
+  }
+  .importance-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--cream);
+    margin-bottom: 1rem;
+  }
+  .importance-desc {
+    font-size: 0.95rem;
+    color: var(--cream-dim);
+    line-height: 1.7;
+  }
+
+  /* ENTRETENIMIENTO */
+  .entertainment-section {
+    background: var(--bg-deep);
+    position: relative;
+    overflow: hidden;
+  }
+  .entertainment-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+  .entertainment-visual {
+    position: relative;
+    aspect-ratio: 4/5;
+    background: linear-gradient(135deg, var(--crimson-deep), var(--bg-elevated));
+    border: 1px solid var(--border-bright);
+    overflow: hidden;
+  }
+  .entertainment-visual::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 30% 30%, rgba(244, 201, 105, 0.2), transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(196, 30, 46, 0.3), transparent 50%);
+  }
+  .projector-beam {
+    position: absolute;
+    top: -10%;
+    right: -10%;
+    width: 80%;
+    height: 70%;
+    background: linear-gradient(225deg, rgba(244, 201, 105, 0.18) 0%, transparent 70%);
+    transform: skewY(-15deg);
+    pointer-events: none;
+  }
+  .film-reel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 65%;
+    aspect-ratio: 1;
+    border: 6px solid var(--gold);
+    border-radius: 50%;
+    animation: rotate 20s linear infinite;
+  }
+  .film-reel::before {
+    content: '';
+    position: absolute;
+    inset: 15%;
+    border: 2px dashed var(--gold-dim);
+    border-radius: 50%;
+  }
+  .film-reel::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 18%;
+    aspect-ratio: 1;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+  .film-reel-small {
+    position: absolute;
+    top: 12%;
+    right: 12%;
+    width: 28%;
+    aspect-ratio: 1;
+    border: 4px solid var(--gold-dim);
+    border-radius: 50%;
+    animation: rotate 15s linear infinite reverse;
+  }
+  .film-reel-small::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 25%;
+    aspect-ratio: 1;
+    background: var(--gold-dim);
+    border-radius: 50%;
+  }
+  .screen-text {
+    position: absolute;
+    bottom: 1.2rem;
+    left: 1.2rem;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    color: var(--gold-bright);
+    opacity: 0.35;
+    letter-spacing: 0.15em;
+    line-height: 1;
+  }
+  @keyframes rotate {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+
+  .entertainment-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    margin-bottom: 1.5rem;
+    color: var(--cream);
+    line-height: 1.2;
+  }
+  .entertainment-text h3 em {
+    font-style: italic;
+    color: var(--gold-bright);
+    font-weight: 400;
+  }
+  .entertainment-text p {
+    color: var(--cream-dim);
+    margin-bottom: 1.2rem;
+    line-height: 1.8;
+  }
+  .entertainment-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+  }
+  .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    color: var(--gold-bright);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+
+  /* JUEGO */
+  .game-section {
+    background:
+      radial-gradient(ellipse at center, rgba(139, 10, 26, 0.25), transparent 70%),
+      var(--bg-deep);
+    position: relative;
+    padding: 8rem 2rem;
+  }
+  .game-frame {
+    max-width: 800px;
+    margin: 3rem auto 0;
+    position: relative;
+    padding: 0 3.5rem;
+  }
+  .game-curtain {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 3.5rem;
+    background:
+      repeating-linear-gradient(to bottom,
+        #4a050d 0, #8b0a1a 14px, #6a0813 28px, #8b0a1a 42px, #4a050d 56px);
+    z-index: 5;
+    box-shadow: 0 0 30px rgba(0,0,0,0.6);
+  }
+  .game-curtain.left { left: 0; }
+  .game-curtain.right { right: 0; }
+
+  .game-screen {
+    background: #000;
+    border: 8px solid var(--bg-elevated);
+    border-radius: 4px;
+    padding: 1.2rem;
+    box-shadow:
+      0 0 60px rgba(212, 162, 76, 0.15),
+      inset 0 0 30px rgba(0,0,0,0.5);
+    position: relative;
+  }
+  .game-screen::before {
+    content: '';
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 8px;
+    background: var(--gold-dim);
+    border-radius: 4px 4px 0 0;
+  }
+  .game-iframe-wrapper {
+    position: relative;
+    width: 100%;
+    background: #fff;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .game-iframe-wrapper iframe {
+    display: block;
+    width: 100%;
+    height: 380px;
+    border: 0;
+  }
+  .game-hint {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--cream-dim);
+    font-style: italic;
+    font-family: 'Playfair Display', serif;
+    font-size: 1rem;
+  }
+  .game-hint i {
+    color: var(--gold);
+    margin-right: 0.5rem;
+  }
+
+  /* AUTOR */
+  .author-section {
+    background: linear-gradient(180deg, var(--bg-deep) 0%, #1a0810 100%);
+    padding: 8rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .author-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 60%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(212, 162, 76, 0.08), transparent 60%);
+  }
+  .author-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 4rem;
+    align-items: center;
+    max-width: 1000px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .author-avatar {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--crimson), var(--gold-dim));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 5rem;
+    font-weight: 900;
+    color: var(--cream);
+    border: 3px solid var(--gold);
+    box-shadow: 0 0 40px rgba(212, 162, 76, 0.3);
+    position: relative;
+  }
+  .author-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -15px;
+    border: 1px solid var(--border-bright);
+    border-radius: 50%;
+  }
+  .author-info .section-label { margin-bottom: 1rem; }
+  .author-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 4vw, 3rem);
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--cream);
+    margin-bottom: 0.5rem;
+  }
+  .author-name em {
+    font-style: italic;
+    color: var(--gold-bright);
+    font-weight: 400;
+  }
+  .author-role {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+  }
+  .author-bio {
+    color: var(--cream-dim);
+    line-height: 1.8;
+    font-size: 1.05rem;
+    max-width: 600px;
+  }
+
+  /* FOOTER */
+  footer {
+    background: #050303;
+    padding: 3rem 2rem 2rem;
+    text-align: center;
+    border-top: 1px solid var(--border);
+    position: relative;
+  }
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .footer-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    color: var(--gold-bright);
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+  }
+  .footer-meta {
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+  }
+  .footer-meta .gold { color: var(--gold); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .section { padding: 4.5rem 1.5rem; }
+    .entertainment-layout { grid-template-columns: 1fr; gap: 2rem; }
+    .author-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+    .author-avatar { margin: 0 auto; }
+    .game-frame { padding: 0 1.5rem; }
+    .game-curtain { width: 1.5rem; }
+    .entertainment-stats { grid-template-columns: 1fr; gap: 1rem; }
+    .hero { padding: 3rem 1.5rem 4rem; }
+    .curtain { width: 50.5%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- Cortinas de apertura -->
+  <div class="curtain left"></div>
+  <div class="curtain right"></div>
+
+  <!-- Cinta de película superior -->
+  <div class="film-strip-top"></div>
+
+  <!-- HERO -->
+  <header class="hero" id="hero">
+    <canvas id="dust-canvas"></canvas>
+    <div class="hero-content">
+      <p class="hero-eyebrow">UN ENSAYO VISUAL SOBRE</p>
+      <h1 class="hero-title">El Séptimo<br><em>Arte</em></h1>
+      <p class="hero-subtitle">Cine: memoria viva de la historia, latido eterno del entretenimiento</p>
+      <div class="hero-meta">
+        <span>Por <strong>César Luis Guerra Romero</strong></span>
+        <span class="dot">•</span>
+        <span>Edición especial</span>
+      </div>
+    </div>
+    <a href="#intro" class="scroll-indicator" aria-label="Bajar a la introducción">
+      <span>Comenzar</span>
+      <i class="fas fa-chevron-down"></i>
+    </a>
+  </header>
+
+  <!-- INTRODUCCIÓN -->
+  <section class="section intro" id="intro">
+    <div class="container">
+      <div class="intro-text reveal">
+        <p>Desde que los hermanos Lumière sorprendieron a un puñado de espectadores en un café de París en <strong>1895</strong>, el cine dejó de ser una simple curiosidad técnica para convertirse en el lenguaje que define cómo nos contamos a nosotros mismos.</p>
+        <p>Más que entretenimiento, es el espejo donde la humanidad se mira, se cuestiona y se reinventa. Cada plano, cada corte, cada silencio en una sala oscura es un fragmento de alma colectiva preservado en celuloide —y ahora en bits— para las generaciones que aún no han nacido.</p>
+      </div>
+
+      <div class="intro-quote reveal">
+        El cine es la vida con las partes aburridas cortadas.
+      </div>
+      <div class="intro-quote-author reveal">— Alfred Hitchcock</div>
+    </div>
+  </section>
+
+  <!-- LÍNEA DE TIEMPO -->
+  <section class="section timeline-section" id="historia">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Línea de tiempo</span>
+        <h2 class="section-title">Hitos que <em>cambiaron</em> la pantalla</h2>
+        <p class="section-subtitle">Un recorrido por los momentos que redefinieron el lenguaje cinematográfico</p>
+      </div>
+
+      <div class="timeline-grid">
+        <article class="timeline-card reveal">
+          <i class="fas fa-film timeline-icon"></i>
+          <div class="timeline-year">1895</div>
+          <h3 class="timeline-title">El nacimiento</h3>
+          <p class="timeline-desc">Los hermanos Lumière proyectan las primeras películas en París. El tren que llegaba a la estación hizo que el público se agachara en sus butacas, creyendo que los atropellaría.</p>
+        </article>
+
+        <article class="timeline-card reveal">
+          <i class="fas fa-volume-high timeline-icon"></i>
+          <div class="timeline-year">1927</div>
+          <h3 class="timeline-title">Llega el sonido</h3>
+          <p class="timeline-desc">"El cantante de jazz" marca el fin del cine mudo. Las palabras se vuelven inmortales y el cine gana una nueva dimensión sensorial que transformaría el arte para siempre.</p>
+        </article>
+
+        <article class="timeline-card reveal">
+          <i class="fas fa-palette timeline-icon"></i>
+          <div class="timeline-year">1939</div>
+          <h3 class="timeline-title">Technicolor deslumbra</h3>
+          <p class="timeline-desc">"Lo que el viento se llevó" y "El mago de Oz" demuestran que el color puede contar historias tan potentes como la luz, abriendo una era visualmente deslumbrante.</p>
+        </article>
+
+        <article class="timeline-card reveal">
+          <i class="fas fa-mountain timeline-icon"></i>
+          <div class="timeline-year">1941</div>
+          <h3 class="timeline-title">Ciudadano Kane</h3>
+          <p class="timeline-desc">Orson Welles revoluciona la profundidad de campo y la narrativa no lineal. El cine descubre que puede ser arte mayor y no solo espectáculo popular.</p>
+        </article>
+
+        <article class="timeline-card reveal">
+          <i class="fas fa-rocket timeline-icon"></i>
+          <div class="timeline-year">1977</div>
+          <h3 class="timeline-title">La era blockbuster</h3>
+          <p class="timeline-desc">"Star Wars" inventa el evento cinematográfico global. El cine se convierte en fenómeno cultural compartido simultáneamente por millones de personas.</p>
+        </article>
+
+        <article class="timeline-card reveal">
+          <i class="fas fa-cube timeline-icon"></i>
+          <div class="timeline-year">1995</div>
+          <h3 class="timeline-title">La era digital</h3>
+          <p class="timeline-desc">"Toy Story" es la primera película completamente generada por computadora. Comienza una nueva forma de hacer cine que hoy domina gran parte de la industria.</p>
+        </article>
+
+        <article class="timeline-card reveal">
+          <i class="fas fa-glasses timeline-icon"></i>
+          <div class="timeline-year">2009</div>
+          <h3 class="timeline-title">Avatar y el 3D</h3>
+          <p class="timeline-desc">James Cameron reaviva el 3D estereoscópico y demuestra que la tecnología puede expandir los límites de la inmersión narrativa del espectador.</p>
+        </article>
+
+        <article class="timeline-card reveal">
+          <i class="fas fa-tv timeline-icon"></i>
+          <div class="timeline-year">Hoy</div>
+          <h3 class="timeline-title">Streaming y más allá</h3>
+          <p class="timeline-desc">Las plataformas digitales transforman el acceso al cine. El séptimo arte se multiplica en pantallas de todos los tamaños, llegando a cada rincón del planeta.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- IMPORTANCIA HISTÓRICA -->
+  <section class="section importance-section" id="importancia">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Por qué importa</span>
+        <h2 class="section-title">El cine como <em>memoria</em> del mundo</h2>
+        <p class="section-subtitle">Seis formas en que las películas han moldeado nuestra historia colectiva</p>
+      </div>
+
+      <div class="importance-grid">
+        <article class="importance-card reveal">
+          <div class="importance-number">01</div>
+          <i class="fas fa-landmark importance-icon"></i>
+          <h3 class="importance-title">Documento histórico</h3>
+          <p class="importance-desc">Cada película es un documento de su época: registra cómo se vestía, cómo se hablaba, qué se temía y qué se deseaba. Ver cine antiguo es viajar en el tiempo sin moverse de la butaca.</p>
+        </article>
+
+        <article class="importance-card reveal">
+          <div class="importance-number">02</div>
+          <i class="fas fa-eye importance-icon"></i>
+          <h3 class="importance-title">Espejo social</h3>
+          <p class="importance-desc">El cine refleja las tensiones de su tiempo: guerras, revoluciones, cambios morales. Lo que la sociedad no se atreve a decir en voz alta, el cine lo pone en pantalla para todos.</p>
+        </article>
+
+        <article class="importance-card reveal">
+          <div class="importance-number">03</div>
+          <i class="fas fa-heart importance-icon"></i>
+          <h3 class="importance-title">Máquina de empatía</h3>
+          <p class="importance-desc">Pocas cosas nos permiten vivir vidas ajenas como el cine. Por dos horas somos otros, sentimos lo que sienten, comprendemos lo que sufren, amamos lo que aman.</p>
+        </article>
+
+        <article class="importance-card reveal">
+          <div class="importance-number">04</div>
+          <i class="fas fa-globe importance-icon"></i>
+          <h3 class="importance-title">Memoria colectiva</h3>
+          <p class="importance-desc">Frases, imágenes y melodías que reconocemos sin haberlas estudiado. El cine crea un acervo común que trasciende fronteras, idiomas y generaciones enteras.</p>
+        </article>
+
+        <article class="importance-card reveal">
+          <div class="importance-number">05</div>
+          <i class="fas fa-comment-dots importance-icon"></i>
+          <h3 class="importance-title">Crónica visual</h3>
+          <p class="importance-desc">Antes de internet, el cine era la ventana al mundo. Documentales y ficciones nos mostraron lugares, culturas y realidades que de otro modo habrían permanecido invisibles.</p>
+        </article>
+
+        <article class="importance-card reveal">
+          <div class="importance-number">06</div>
+          <i class="fas fa-bullseye importance-icon"></i>
+          <h3 class="importance-title">Conciencia global</h3>
+          <p class="importance-desc">Desde "La lista de Schindler" hasta "Una verdad incómoda", el cine ha movido conciencias, despertado indignación y provocado cambios reales en el mundo.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ENTRETENIMIENTO -->
+  <section class="section entertainment-section" id="entretenimiento">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">El lado brillante</span>
+        <h2 class="section-title">Pura <em>magia</em> de entretenimiento</h2>
+      </div>
+
+      <div class="entertainment-layout">
+        <div class="entertainment-visual reveal">
+          <div class="projector-beam"></div>
+          <div class="film-reel-small"></div>
+          <div class="film-reel"></div>
+          <div class="screen-text">CINE</div>
+        </div>
+        <div class="entertainment-text reveal">
+          <h3>Donde la luz se convierte en <em>emoción</em></h3>
+          <p>El cine es, antes que nada, una de las formas más puras de entretenimiento jamás inventadas. En una sala oscura, extraños comparten risas, lágrimas y suspiros al unísono, unidos por la misma historia durante dos horas.</p>
+          <p>Es evasión y encuentro, fantasía y reflejo. Desde el blockbuster de verano hasta la película independiente de festival, cada filme es una invitación a dejar atrás el mundo y regresar transformado.</p>
+
+          <div class="entertainment-stats">
+            <div>
+              <div class="stat-value">130+</div>
+              <div class="stat-label">Años de historia</div>
+            </div>
+            <div>
+              <div class="stat-value">50K</div>
+              <div class="stat-label">Películas por año</div>
+            </div>
+            <div>
+              <div class="stat-value">$100B</div>
+              <div class="stat-label">Industria global</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JUEGO INTERACTIVO -->
+  <section class="section game-section" id="juego">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">Ahora te toca</span>
+        <h2 class="section-title">Pon a prueba tu <em>mirada</em></h2>
+        <p class="section-subtitle">¿Cuánto sabes del séptimo arte? Atrévete a jugar</p>
+      </div>
+
+      <div class="game-frame reveal">
+        <div class="game-curtain left"></div>
+        <div class="game-curtain right"></div>
+        <div class="game-screen">
+          <div class="game-iframe-wrapper">
+            <iframe src="https://wordwall.net/es/embed/f756f5089da548d6879f61cd5b4272e7?themeId=1&templateId=5&fontStackId=0" width="100%" height="380" frameborder="0" allowfullscreen></iframe>
+          </div>
+        </div>
+      </div>
+
+      <p class="game-hint reveal"><i class="fas fa-clapperboard"></i> Toca, arrastra y descubre cuánto cine habita en ti</p>
+    </div>
+  </section>
+
+  <!-- AUTOR -->
+  <section class="author-section" id="autor">
+    <div class="author-grid">
+      <div class="author-avatar reveal">C</div>
+      <div class="author-info reveal">
+        <span class="section-label">El autor</span>
+        <h2 class="author-name">César Luis <em>Guerra</em><br>Romero</h2>
+        <p class="author-role">Creador · Cinéfilo · Cronista</p>
+        <p class="author-bio">Apasionado por las historias que solo el cine puede contar. Esta página es un homenaje a ese arte que combina luz, tiempo y emoción para hacernos sentir, aunque sea por un instante, que todo es posible. Porque cada película es una vida vivida y, al mismo tiempo, infinitas vidas por descubrir.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <p class="footer-quote">"El cine es una industria, pero también un arte. Y como todo arte, merece ser celebrado."</p>
+      <p class="footer-meta">© <span class="gold">César Luis Guerra Romero</span> · Una página dedicada al séptimo arte · Hecha con luz, música y celuloide</p>
+    </div>
+  </footer>
+
+<script>
+  // Apertura de cortinas al cargar
+  window.addEventListener('load', () => {
+    setTimeout(() => document.body.classList.add('loaded'), 150);
+  });
+
+  // Efecto spotlight en el hero siguiendo el cursor
+  const hero = document.getElementById('hero');
+  hero.addEventListener('mousemove', (e) => {
+    const rect = hero.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    hero.style.setProperty('--mx', `${x}%`);
+    hero.style.setProperty('--my', `${y}%`);
+  });
+
+  // Partículas de polvo de proyector (canvas)
+  const canvas = document.getElementById('dust-canvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+
+  function resizeCanvas() {
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+  }
+
+  function initParticles() {
+    particles = [];
+    const count = Math.min(140, Math.floor((canvas.width * canvas.height) / 11000));
+    for (let i = 0; i < count; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: -Math.random() * 0.4 - 0.05,
+        r: Math.random() * 1.5 + 0.3,
+        alpha: Math.random() * 0.5 + 0.2,
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: 0.012 + Math.random() * 0.02
+      });
+    }
+  }
+
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.pulse += p.pulseSpeed;
+
+      // Reciclar partículas que salen del canvas
+      if (p.y < -10) {
+        p.y = canvas.height + 10;
+        p.x = Math.random() * canvas.width;
+      }
+      if (p.x < -10) p.x = canvas.width + 10;
+      if (p.x > canvas.width + 10) p.x = -10;
+
+      const alpha = p.alpha * (0.5 + Math.sin(p.pulse) * 0.5);
+      const radius = Math.max(0.1, p.r);
+
+      // Halo suave
+      const glowRadius = Math.max(0.5, radius * 4);
+      const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius);
+      gradient.addColorStop(0, `rgba(244, 201, 105, ${alpha * 0.35})`);
+      gradient.addColorStop(1, 'rgba(244, 201, 105, 0)');
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Núcleo
+      ctx.fillStyle = `rgba(244, 201, 105, ${alpha})`;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    requestAnimationFrame(animateParticles);
+  }
+
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    initParticles();
+  });
+
+  resizeCanvas();
+  initParticles();
+  animateParticles();
+
+  // Animaciones de revelado al hacer scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Retardo escalonado en grids para efecto cascada
+  document.querySelectorAll('.timeline-grid, .importance-grid').forEach(grid => {
+    const cards = grid.querySelectorAll('.reveal');
+    cards.forEach((card, i) => {
+      card.style.transitionDelay = `${(i % 4) * 0.08}s`;
+    });
+  });
+</script>
+</body>
+</html>

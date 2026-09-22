@@ -3,1163 +3,1396 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>El Séptimo Arte — César Luis Guerra Romero</title>
-<meta name="description" content="Un viaje por la importancia del cine en la historia y el entretenimiento. Por César Luis Guerra Romero.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>Simulador de Orientación Vocacional y Ruta Universitaria</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
+  /* =========================================================
+     ESTILO ACADÉMICO AZUL
+     ========================================================= */
   :root {
-    --bg-deep: #0a0606;
-    --bg: #14090b;
-    --bg-elevated: #1c1013;
-    --bg-card: #1a0e11;
-    --gold: #d4a24c;
-    --gold-bright: #f4c969;
-    --gold-dim: #8b6b2e;
-    --crimson: #8b0a1a;
-    --crimson-bright: #c41e2e;
-    --crimson-deep: #4a050d;
-    --cream: #f5e9d3;
-    --cream-dim: #c9b89a;
-    --muted: #8a7a6b;
-    --border: rgba(212, 162, 76, 0.18);
-    --border-bright: rgba(212, 162, 76, 0.4);
+    --azul-marino: #0a2540;
+    --azul-medio: #14507c;
+    --azul-claro: #2b7ab9;
+    --azul-fondo: #eef4fa;
+    --dorado: #c9a227;
+    --gris-claro: #f5f7fa;
+    --gris-borde: #d4dde6;
+    --verde-exito: #1f8a4c;
+    --rojo-error: #b3261e;
+    --texto-oscuro: #1a2535;
+    --texto-medio: #4a5b6e;
+    --sombra: 0 4px 16px rgba(10, 37, 64, 0.10);
+    --sombra-fuerte: 0 8px 30px rgba(10, 37, 64, 0.18);
   }
 
-  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: 'Manrope', sans-serif;
-    background: var(--bg-deep);
-    color: var(--cream);
-    overflow-x: hidden;
+    font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    background: var(--gris-claro);
+    color: var(--texto-oscuro);
     line-height: 1.6;
-    -webkit-font-smoothing: antialiased;
-    padding-top: 28px;
-  }
-
-  ::selection { background: var(--gold); color: var(--bg-deep); }
-
-  ::-webkit-scrollbar { width: 10px; }
-  ::-webkit-scrollbar-track { background: var(--bg-deep); }
-  ::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 5px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--gold); }
-
-  /* Grano de película global */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    opacity: 0.05;
-    pointer-events: none;
-    z-index: 9999;
-    mix-blend-mode: overlay;
-  }
-
-  /* Cinta de película superior */
-  .film-strip-top {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    height: 28px;
-    background: #050303;
-    z-index: 90;
-    border-bottom: 1px solid var(--border);
-  }
-  .film-strip-top::before,
-  .film-strip-top::after {
-    content: '';
-    position: absolute;
-    left: 0; right: 0;
-    height: 6px;
-    background-image: radial-gradient(circle, var(--cream) 1.8px, transparent 2.2px);
-    background-size: 14px 6px;
-    background-repeat: repeat-x;
-    background-position: 0 center;
-  }
-  .film-strip-top::before { top: 5px; }
-  .film-strip-top::after { bottom: 5px; }
-
-  /* Cortinas de apertura */
-  .curtain {
-    position: fixed;
-    top: 0; bottom: 0;
-    width: 50.5%;
-    background:
-      repeating-linear-gradient(to right,
-        #4a050d 0, #8b0a1a 18px, #6a0813 38px, #8b0a1a 58px, #4a050d 78px),
-      linear-gradient(to right, #2a0307, #5a0510);
-    z-index: 200;
-    transition: transform 1.8s cubic-bezier(0.76, 0, 0.24, 1) 0.4s;
-    box-shadow: 0 0 60px rgba(0,0,0,0.9);
-  }
-  .curtain.left { left: 0; }
-  .curtain.right { right: 0; }
-  body.loaded .curtain.left { transform: translateX(-100%); }
-  body.loaded .curtain.right { transform: translateX(100%); }
-
-  /* HERO */
-  .hero {
-    position: relative;
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 4rem 2rem 5rem;
-    overflow: hidden;
-    background:
-      radial-gradient(ellipse 70% 60% at var(--mx, 50%) var(--my, 50%), rgba(244, 201, 105, 0.12) 0%, transparent 50%),
-      radial-gradient(ellipse 60% 80% at 50% 100%, rgba(139, 10, 26, 0.45) 0%, transparent 60%),
-      linear-gradient(180deg, var(--bg-deep) 0%, #1a0810 100%);
   }
 
-  #dust-canvas {
+  /* ---------- ENCABEZADO CON ESCUDO ---------- */
+  header {
+    background: linear-gradient(135deg, var(--azul-marino) 0%, var(--azul-medio) 100%);
+    color: #fff;
+    padding: 22px 30px;
+    box-shadow: var(--sombra-fuerte);
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: "";
     position: absolute;
-    inset: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(201,162,39,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .header-contenido {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
     z-index: 1;
   }
+  .escudo {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    background: #fff;
+    padding: 4px;
+    box-shadow: 0 0 0 3px var(--dorado), 0 4px 12px rgba(0,0,0,0.25);
+    object-fit: cover;
+    flex-shrink: 0;
+  }
+  .header-texto h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    line-height: 1.3;
+  }
+  .header-texto p {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-top: 4px;
+    font-style: italic;
+  }
 
-  .hero-content {
-    position: relative;
-    z-index: 2;
+  /* ---------- CONTENEDOR PRINCIPAL ---------- */
+  main {
     max-width: 1100px;
+    margin: 30px auto;
+    padding: 0 20px;
   }
 
-  .hero-eyebrow {
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 0.4em;
-    font-size: clamp(0.85rem, 1.5vw, 1.1rem);
-    color: var(--gold);
-    margin-bottom: 1.5rem;
-    opacity: 0;
-    animation: fadeUp 1s ease 0.8s forwards;
+  .seccion {
+    display: none;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: var(--sombra);
+    padding: 35px 40px;
+    margin-bottom: 30px;
+    animation: aparecer 0.4s ease;
   }
+  .seccion.activa { display: block; }
 
-  .hero-title {
-    font-family: 'Playfair Display', serif;
-    font-weight: 900;
-    font-size: clamp(3.5rem, 12vw, 9.5rem);
-    line-height: 0.95;
-    letter-spacing: -0.02em;
-    color: var(--cream);
-    margin-bottom: 1.5rem;
-    opacity: 0;
-    animation: fadeUp 1.2s ease 1.1s forwards;
-  }
-  .hero-title em {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--gold-bright);
-    display: inline-block;
-    position: relative;
-  }
-  .hero-title em::after {
-    content: '';
-    position: absolute;
-    bottom: 0.08em;
-    left: 0; right: 0;
-    height: 4px;
-    background: var(--crimson-bright);
-    transform: scaleX(0);
-    transform-origin: left;
-    animation: lineGrow 1s ease 2s forwards;
-  }
-
-  .hero-subtitle {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: clamp(1.1rem, 2.2vw, 1.6rem);
-    color: var(--cream-dim);
-    max-width: 700px;
-    margin: 0 auto 2.5rem;
-    opacity: 0;
-    animation: fadeUp 1s ease 1.5s forwards;
-  }
-
-  .hero-meta {
-    font-size: 0.8rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    opacity: 0;
-    animation: fadeUp 1s ease 1.8s forwards;
-  }
-  .hero-meta .dot { color: var(--gold); }
-  .hero-meta strong { color: var(--cream); font-weight: 500; }
-
-  .scroll-indicator {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--gold);
-    font-size: 0.7rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    text-decoration: none;
-    opacity: 0;
-    animation: fadeUp 1s ease 2.2s forwards;
-  }
-  .scroll-indicator i { animation: bounceDown 2s ease-in-out infinite; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
+  @keyframes aparecer {
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  @keyframes lineGrow { to { transform: scaleX(1); } }
-  @keyframes bounceDown {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(8px); }
-  }
 
-  /* SECCIONES */
-  .section {
-    padding: 7rem 2rem;
-    position: relative;
-  }
-  .container { max-width: 1200px; margin: 0 auto; }
-
-  .section-header {
-    text-align: center;
-    margin-bottom: 4rem;
-  }
-  .section-label {
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 0.4em;
-    font-size: 0.85rem;
-    color: var(--gold);
-    margin-bottom: 1rem;
+  h2 {
+    color: var(--azul-marino);
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+    padding-bottom: 12px;
+    border-bottom: 3px solid var(--dorado);
     display: inline-block;
-    padding: 0.4rem 1.2rem;
-    border: 1px solid var(--border-bright);
-    border-radius: 100px;
   }
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-weight: 900;
-    font-size: clamp(2.2rem, 5vw, 3.8rem);
-    line-height: 1.1;
-    color: var(--cream);
-    margin-bottom: 1rem;
-  }
-  .section-title em {
-    font-style: italic;
-    font-weight: 400;
-    color: var(--gold-bright);
-  }
-  .section-subtitle {
+  h3 {
+    color: var(--azul-medio);
     font-size: 1.1rem;
-    color: var(--cream-dim);
-    max-width: 700px;
-    margin: 0 auto;
-    font-style: italic;
-    font-family: 'Playfair Display', serif;
+    margin: 20px 0 10px;
   }
+  p { margin-bottom: 12px; color: var(--texto-medio); }
+  .subtitulo { color: var(--texto-medio); margin-bottom: 25px; font-size: 0.95rem; }
 
-  .reveal {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
-  }
-  .reveal.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* INTRO */
-  .intro {
-    background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 100%);
-  }
-  .intro-text {
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-    font-size: 1.15rem;
-    line-height: 1.85;
-    color: var(--cream-dim);
-  }
-  .intro-text p + p { margin-top: 1.5rem; }
-  .intro-text strong { color: var(--cream); font-weight: 500; }
-
-  .intro-quote {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: clamp(1.5rem, 3vw, 2.2rem);
-    text-align: center;
-    color: var(--gold-bright);
-    margin: 4rem auto 1rem;
-    max-width: 900px;
-    line-height: 1.4;
-    position: relative;
-    padding: 2rem 1rem;
-  }
-  .intro-quote::before,
-  .intro-quote::after {
-    content: '"';
-    font-family: 'Playfair Display', serif;
-    font-size: 5rem;
-    color: var(--crimson-bright);
-    position: absolute;
-    opacity: 0.6;
-    line-height: 1;
-  }
-  .intro-quote::before { top: -0.5rem; left: -0.5rem; }
-  .intro-quote::after { bottom: -2.5rem; right: -0.5rem; }
-  .intro-quote-author {
-    text-align: center;
-    font-size: 0.85rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 2rem;
-  }
-
-  /* TIMELINE */
-  .timeline-section {
-    background: var(--bg);
-    position: relative;
-  }
-  .timeline-section::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold), transparent);
-  }
-  .timeline-grid {
+  /* ---------- FORMULARIOS ---------- */
+  .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-    margin-top: 3rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px 24px;
+    margin-top: 15px;
   }
-  .timeline-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 2rem;
-    position: relative;
-    transition: all 0.4s ease;
+  .campo { display: flex; flex-direction: column; gap: 6px; }
+  .campo.full { grid-column: 1 / -1; }
+  label {
+    font-weight: 600;
+    color: var(--azul-marino);
+    font-size: 0.9rem;
+  }
+  label .req { color: var(--rojo-error); }
+  input, select, textarea {
+    padding: 10px 12px;
+    border: 1.5px solid var(--gris-borde);
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--texto-oscuro);
+    background: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--azul-claro);
+    box-shadow: 0 0 0 3px rgba(43,122,185,0.15);
+  }
+  .ayuda { font-size: 0.78rem; color: var(--texto-medio); }
+
+  /* ---------- BOTONES ---------- */
+  .botones {
+    display: flex;
+    gap: 12px;
+    justify-content: space-between;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+  button, .btn {
+    background: var(--azul-medio);
+    color: #fff;
+    border: none;
+    padding: 12px 26px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  button:hover, .btn:hover {
+    background: var(--azul-marino);
+    transform: translateY(-1px);
+    box-shadow: var(--sombra);
+  }
+  button:disabled {
+    background: #b5c2d0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  button.secundario {
+    background: transparent;
+    color: var(--azul-medio);
+    border: 1.5px solid var(--azul-medio);
+  }
+  button.secundario:hover {
+    background: var(--azul-fondo);
+    color: var(--azul-marino);
+  }
+  button.dorado {
+    background: var(--dorado);
+    color: var(--azul-marino);
+  }
+  button.dorado:hover { background: #b08e1f; color: #fff; }
+
+  /* ---------- TEST ---------- */
+  .progreso-contenedor {
+    background: var(--gris-claro);
+    border-radius: 20px;
+    height: 14px;
     overflow: hidden;
+    margin-bottom: 8px;
+    border: 1px solid var(--gris-borde);
   }
-  .timeline-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0;
-    width: 4px;
-    height: 0;
-    background: linear-gradient(to bottom, var(--gold-bright), var(--crimson-bright));
-    transition: height 0.5s ease;
+  .progreso-barra {
+    background: linear-gradient(90deg, var(--azul-claro), var(--azul-medio));
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+    border-radius: 20px;
   }
-  .timeline-card:hover::before { height: 100%; }
-  .timeline-card:hover {
-    transform: translateY(-6px);
-    border-color: var(--border-bright);
-    background: var(--bg-elevated);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  .progreso-texto {
+    text-align: right;
+    font-size: 0.82rem;
+    color: var(--texto-medio);
+    margin-bottom: 20px;
+    font-weight: 600;
   }
-  .timeline-year {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 3rem;
-    color: var(--gold-bright);
-    line-height: 1;
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.05em;
+  .pregunta-bloque {
+    background: var(--azul-fondo);
+    border-left: 4px solid var(--azul-claro);
+    padding: 18px 22px;
+    border-radius: 6px;
+    margin-bottom: 18px;
   }
-  .timeline-title {
-    font-family: 'Playfair Display', serif;
+  .pregunta-numero {
+    font-size: 0.78rem;
+    color: var(--azul-medio);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+  .pregunta-texto {
+    font-size: 1.02rem;
+    color: var(--texto-oscuro);
+    margin: 6px 0 14px;
+    font-weight: 500;
+  }
+  .escala-opciones {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .opcion {
+    flex: 1;
+    min-width: 110px;
+    text-align: center;
+    padding: 10px 8px;
+    background: #fff;
+    border: 2px solid var(--gris-borde);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.82rem;
+    color: var(--texto-medio);
+  }
+  .opcion:hover {
+    border-color: var(--azul-claro);
+    background: var(--azul-fondo);
+  }
+  .opcion.seleccionada {
+    background: var(--azul-medio);
+    color: #fff;
+    border-color: var(--azul-marino);
+    font-weight: 600;
+  }
+  .opcion .numero {
+    display: block;
     font-size: 1.3rem;
     font-weight: 700;
-    color: var(--cream);
-    margin-bottom: 1rem;
+    margin-bottom: 2px;
   }
-  .timeline-desc {
-    font-size: 0.95rem;
-    color: var(--cream-dim);
-    line-height: 1.6;
-  }
-  .timeline-icon {
-    position: absolute;
-    top: 1.5rem;
-    right: 1.5rem;
-    font-size: 1.4rem;
-    color: var(--gold-dim);
-    opacity: 0.5;
-    transition: all 0.4s ease;
-  }
-  .timeline-card:hover .timeline-icon {
-    color: var(--gold-bright);
-    opacity: 1;
-    transform: rotate(-10deg) scale(1.1);
-  }
-
-  /* IMPORTANCIA */
-  .importance-section {
-    background: linear-gradient(180deg, var(--bg) 0%, var(--bg-deep) 100%);
-  }
-  .importance-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-  }
-  .importance-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    padding: 2.5rem 2rem;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-  }
-  .importance-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at top right, rgba(212, 162, 76, 0.08), transparent 60%);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-  }
-  .importance-card:hover::after { opacity: 1; }
-  .importance-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--border-bright);
-  }
-  .importance-number {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    font-size: 1rem;
-    color: var(--gold);
-    margin-bottom: 1rem;
-    letter-spacing: 0.1em;
-  }
-  .importance-icon {
-    font-size: 2rem;
-    color: var(--gold-bright);
-    margin-bottom: 1.5rem;
-  }
-  .importance-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--cream);
-    margin-bottom: 1rem;
-  }
-  .importance-desc {
-    font-size: 0.95rem;
-    color: var(--cream-dim);
-    line-height: 1.7;
-  }
-
-  /* ENTRETENIMIENTO */
-  .entertainment-section {
-    background: var(--bg-deep);
-    position: relative;
-    overflow: hidden;
-  }
-  .entertainment-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-  }
-  .entertainment-visual {
-    position: relative;
-    aspect-ratio: 4/5;
-    background: linear-gradient(135deg, var(--crimson-deep), var(--bg-elevated));
-    border: 1px solid var(--border-bright);
-    overflow: hidden;
-  }
-  .entertainment-visual::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 30% 30%, rgba(244, 201, 105, 0.2), transparent 50%),
-      radial-gradient(circle at 70% 70%, rgba(196, 30, 46, 0.3), transparent 50%);
-  }
-  .projector-beam {
-    position: absolute;
-    top: -10%;
-    right: -10%;
-    width: 80%;
-    height: 70%;
-    background: linear-gradient(225deg, rgba(244, 201, 105, 0.18) 0%, transparent 70%);
-    transform: skewY(-15deg);
-    pointer-events: none;
-  }
-  .film-reel {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 65%;
-    aspect-ratio: 1;
-    border: 6px solid var(--gold);
-    border-radius: 50%;
-    animation: rotate 20s linear infinite;
-  }
-  .film-reel::before {
-    content: '';
-    position: absolute;
-    inset: 15%;
-    border: 2px dashed var(--gold-dim);
-    border-radius: 50%;
-  }
-  .film-reel::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 18%;
-    aspect-ratio: 1;
-    background: var(--gold);
-    border-radius: 50%;
-  }
-  .film-reel-small {
-    position: absolute;
-    top: 12%;
-    right: 12%;
-    width: 28%;
-    aspect-ratio: 1;
-    border: 4px solid var(--gold-dim);
-    border-radius: 50%;
-    animation: rotate 15s linear infinite reverse;
-  }
-  .film-reel-small::after {
-    content: '';
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    width: 25%;
-    aspect-ratio: 1;
-    background: var(--gold-dim);
-    border-radius: 50%;
-  }
-  .screen-text {
-    position: absolute;
-    bottom: 1.2rem;
-    left: 1.2rem;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(2.5rem, 6vw, 4rem);
-    color: var(--gold-bright);
-    opacity: 0.35;
-    letter-spacing: 0.15em;
-    line-height: 1;
-  }
-  @keyframes rotate {
-    to { transform: translate(-50%, -50%) rotate(360deg); }
-  }
-
-  .entertainment-text h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
-    margin-bottom: 1.5rem;
-    color: var(--cream);
-    line-height: 1.2;
-  }
-  .entertainment-text h3 em {
-    font-style: italic;
-    color: var(--gold-bright);
-    font-weight: 400;
-  }
-  .entertainment-text p {
-    color: var(--cream-dim);
-    margin-bottom: 1.2rem;
-    line-height: 1.8;
-  }
-  .entertainment-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
-  }
-  .stat-value {
-    font-family: 'Playfair Display', serif;
-    font-size: 2.2rem;
-    font-weight: 900;
-    color: var(--gold-bright);
-    line-height: 1;
-  }
-  .stat-label {
+  .escala-leyenda {
     font-size: 0.75rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 0.5rem;
-  }
-
-  /* JUEGO */
-  .game-section {
-    background:
-      radial-gradient(ellipse at center, rgba(139, 10, 26, 0.25), transparent 70%),
-      var(--bg-deep);
-    position: relative;
-    padding: 8rem 2rem;
-  }
-  .game-frame {
-    max-width: 800px;
-    margin: 3rem auto 0;
-    position: relative;
-    padding: 0 3.5rem;
-  }
-  .game-curtain {
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 3.5rem;
-    background:
-      repeating-linear-gradient(to bottom,
-        #4a050d 0, #8b0a1a 14px, #6a0813 28px, #8b0a1a 42px, #4a050d 56px);
-    z-index: 5;
-    box-shadow: 0 0 30px rgba(0,0,0,0.6);
-  }
-  .game-curtain.left { left: 0; }
-  .game-curtain.right { right: 0; }
-
-  .game-screen {
-    background: #000;
-    border: 8px solid var(--bg-elevated);
-    border-radius: 4px;
-    padding: 1.2rem;
-    box-shadow:
-      0 0 60px rgba(212, 162, 76, 0.15),
-      inset 0 0 30px rgba(0,0,0,0.5);
-    position: relative;
-  }
-  .game-screen::before {
-    content: '';
-    position: absolute;
-    top: -16px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 60px;
-    height: 8px;
-    background: var(--gold-dim);
-    border-radius: 4px 4px 0 0;
-  }
-  .game-iframe-wrapper {
-    position: relative;
-    width: 100%;
-    background: #fff;
-    border-radius: 2px;
-    overflow: hidden;
-  }
-  .game-iframe-wrapper iframe {
-    display: block;
-    width: 100%;
-    height: 380px;
-    border: 0;
-  }
-  .game-hint {
-    text-align: center;
-    margin-top: 2rem;
-    color: var(--cream-dim);
+    color: var(--texto-medio);
+    margin-top: 8px;
     font-style: italic;
-    font-family: 'Playfair Display', serif;
-    font-size: 1rem;
-  }
-  .game-hint i {
-    color: var(--gold);
-    margin-right: 0.5rem;
   }
 
-  /* AUTOR */
-  .author-section {
-    background: linear-gradient(180deg, var(--bg-deep) 0%, #1a0810 100%);
-    padding: 8rem 2rem;
-    position: relative;
-    overflow: hidden;
+  /* ---------- RESULTADOS ---------- */
+  .resultado-resumen {
+    background: linear-gradient(135deg, var(--azul-fondo) 0%, #fff 100%);
+    padding: 25px;
+    border-radius: 8px;
+    border: 1px solid var(--gris-borde);
+    margin-bottom: 25px;
   }
-  .author-section::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 60%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(212, 162, 76, 0.08), transparent 60%);
+  .resultado-resumen h3 {
+    margin-top: 0;
+    color: var(--azul-marino);
+    font-size: 1.2rem;
   }
-  .author-grid {
+  .estudiante-info {
     display: grid;
-    grid-template-columns: auto 1fr;
-    gap: 4rem;
-    align-items: center;
-    max-width: 1000px;
-    margin: 0 auto;
-    position: relative;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 20px;
+    margin-top: 12px;
+    font-size: 0.92rem;
   }
-  .author-avatar {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--crimson), var(--gold-dim));
+  .estudiante-info div { color: var(--texto-medio); }
+  .estudiante-info strong { color: var(--azul-marino); }
+
+  .area-resultado {
+    background: #fff;
+    border: 1.5px solid var(--gris-borde);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+    transition: all 0.3s;
+  }
+  .area-resultado.top {
+    border-color: var(--dorado);
+    box-shadow: 0 0 0 2px rgba(201,162,39,0.2);
+  }
+  .area-resultado.top .area-nombre::before {
+    content: "★ ";
+    color: var(--dorado);
+  }
+  .area-header {
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    font-family: 'Playfair Display', serif;
-    font-size: 5rem;
-    font-weight: 900;
-    color: var(--cream);
-    border: 3px solid var(--gold);
-    box-shadow: 0 0 40px rgba(212, 162, 76, 0.3);
-    position: relative;
+    margin-bottom: 8px;
   }
-  .author-avatar::after {
-    content: '';
-    position: absolute;
-    inset: -15px;
-    border: 1px solid var(--border-bright);
-    border-radius: 50%;
-  }
-  .author-info .section-label { margin-bottom: 1rem; }
-  .author-name {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2rem, 4vw, 3rem);
-    font-weight: 900;
-    line-height: 1.1;
-    color: var(--cream);
-    margin-bottom: 0.5rem;
-  }
-  .author-name em {
-    font-style: italic;
-    color: var(--gold-bright);
-    font-weight: 400;
-  }
-  .author-role {
-    font-family: 'Bebas Neue', sans-serif;
-    letter-spacing: 0.3em;
-    color: var(--gold);
-    margin-bottom: 1.5rem;
-    font-size: 0.95rem;
-  }
-  .author-bio {
-    color: var(--cream-dim);
-    line-height: 1.8;
+  .area-nombre {
+    font-weight: 700;
+    color: var(--azul-marino);
     font-size: 1.05rem;
-    max-width: 600px;
+  }
+  .area-porcentaje {
+    font-weight: 700;
+    color: var(--azul-medio);
+    font-size: 1.2rem;
+  }
+  .barra-afinidad {
+    background: var(--gris-claro);
+    border-radius: 10px;
+    height: 12px;
+    overflow: hidden;
+    margin-bottom: 10px;
+  }
+  .barra-afinidad > div {
+    background: linear-gradient(90deg, var(--azul-claro), var(--azul-medio));
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s ease;
+  }
+  .area-resultado.top .barra-afinidad > div {
+    background: linear-gradient(90deg, var(--dorado), #e6c14a);
+  }
+  .carreras-lista {
+    margin-top: 10px;
+    padding-left: 0;
+    list-style: none;
+  }
+  .carreras-lista li {
+    background: var(--azul-fondo);
+    padding: 6px 12px;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    font-size: 0.88rem;
+    color: var(--texto-oscuro);
+    border-left: 3px solid var(--azul-claro);
   }
 
-  /* FOOTER */
-  footer {
-    background: #050303;
-    padding: 3rem 2rem 2rem;
-    text-align: center;
-    border-top: 1px solid var(--border);
-    position: relative;
+  /* ---------- UNIVERSIDADES ---------- */
+  .filtros-panel {
+    background: var(--azul-fondo);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
   }
-  .footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
+  .filtros-panel h3 { margin-top: 0; }
+  .universidad-card {
+    background: #fff;
+    border: 1.5px solid var(--gris-borde);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+    transition: all 0.2s;
+    border-left: 4px solid var(--azul-claro);
   }
-  .footer-quote {
-    font-family: 'Playfair Display', serif;
-    font-style: italic;
-    color: var(--gold-bright);
-    margin-bottom: 1.5rem;
-    font-size: 1.1rem;
+  .universidad-card:hover {
+    box-shadow: var(--sombra);
+    transform: translateX(3px);
   }
-  .footer-meta {
-    color: var(--muted);
+  .universidad-card.privada { border-left-color: var(--dorado); }
+  .uni-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .uni-nombre {
+    font-weight: 700;
+    color: var(--azul-marino);
+    font-size: 1.05rem;
+  }
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+  .badge.publica { background: #e0f0e6; color: var(--verde-exito); }
+  .badge.privada { background: #fbf3d5; color: #8c6e15; }
+  .badge.modalidad { background: var(--azul-fondo); color: var(--azul-medio); }
+  .uni-detalles {
+    font-size: 0.88rem;
+    color: var(--texto-medio);
+    margin: 4px 0;
+  }
+  .uni-detalles strong { color: var(--texto-oscuro); }
+  .uni-carreras {
+    margin-top: 10px;
     font-size: 0.85rem;
-    letter-spacing: 0.1em;
+    color: var(--texto-medio);
   }
-  .footer-meta .gold { color: var(--gold); }
-
-  /* RESPONSIVE */
-  @media (max-width: 768px) {
-    .section { padding: 4.5rem 1.5rem; }
-    .entertainment-layout { grid-template-columns: 1fr; gap: 2rem; }
-    .author-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
-    .author-avatar { margin: 0 auto; }
-    .game-frame { padding: 0 1.5rem; }
-    .game-curtain { width: 1.5rem; }
-    .entertainment-stats { grid-template-columns: 1fr; gap: 1rem; }
-    .hero { padding: 3rem 1.5rem 4rem; }
-    .curtain { width: 50.5%; }
+  .no-resultados {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--texto-medio);
+    font-style: italic;
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-      animation-duration: 0.01ms !important;
-      transition-duration: 0.01ms !important;
-    }
+  /* ---------- BECAS ICETEX ---------- */
+  .beca-card {
+    background: #fff;
+    border: 1.5px solid var(--gris-borde);
+    border-left: 4px solid var(--verde-exito);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin-bottom: 14px;
+  }
+  .beca-card h4 {
+    color: var(--verde-exito);
+    margin-bottom: 8px;
+    font-size: 1.02rem;
+  }
+  .beca-card p { font-size: 0.9rem; margin-bottom: 6px; }
+  .beca-card ul { padding-left: 20px; margin-top: 6px; }
+  .beca-card li { font-size: 0.88rem; color: var(--texto-medio); margin-bottom: 4px; }
+
+  /* ---------- AVISOS ---------- */
+  .aviso {
+    padding: 12px 18px;
+    border-radius: 6px;
+    margin-bottom: 18px;
+    font-size: 0.9rem;
+  }
+  .aviso.info {
+    background: var(--azul-fondo);
+    border-left: 4px solid var(--azul-claro);
+    color: var(--azul-medio);
+  }
+  .aviso.exito {
+    background: #e0f0e6;
+    border-left: 4px solid var(--verde-exito);
+    color: var(--verde-exito);
+  }
+  .aviso.error {
+    background: #fce8e6;
+    border-left: 4px solid var(--rojo-error);
+    color: var(--rojo-error);
+  }
+
+  /* ---------- PIE DE PÁGINA ---------- */
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: var(--texto-medio);
+    font-size: 0.82rem;
+    border-top: 1px solid var(--gris-borde);
+    background: #fff;
+    margin-top: 30px;
+  }
+  footer strong { color: var(--azul-marino); }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 700px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .escala-opciones { flex-direction: column; }
+    .opcion { min-width: 100%; }
+    .seccion { padding: 22px 18px; }
+    .header-texto h1 { font-size: 1.1rem; }
+    .escudo { width: 60px; height: 60px; }
+    .estudiante-info { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- ESTILOS DE IMPRESIÓN / PDF ---------- */
+  @media print {
+    body { background: #fff; }
+    header, footer, .botones, .no-imprimir { display: none !important; }
+    main { margin: 0; padding: 0; max-width: 100%; }
+    .seccion { box-shadow: none; padding: 10px 0; page-break-inside: avoid; }
+    .seccion.activa { display: block !important; }
+    .area-resultado, .universidad-card, .beca-card { page-break-inside: avoid; }
+    h2 { font-size: 1.3rem; }
   }
 </style>
 </head>
 <body>
-  <!-- Cortinas de apertura -->
-  <div class="curtain left"></div>
-  <div class="curtain right"></div>
 
-  <!-- Cinta de película superior -->
-  <div class="film-strip-top"></div>
+<header>
+  <div class="header-contenido">
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQsqX8L2Au3NXg59hJuvskfWdc2PONFDMbnseHYjjt_qw&s=10" alt="Escudo institucional" class="escudo">
+    <div class="header-texto">
+      <h1>Simulador de Orientación Vocacional y Ruta Universitaria</h1>
+      <p>Proyecto de Programación · Grado 11° · Encuentra tu camino profesional</p>
+    </div>
+  </div>
+</header>
 
-  <!-- HERO -->
-  <header class="hero" id="hero">
-    <canvas id="dust-canvas"></canvas>
-    <div class="hero-content">
-      <p class="hero-eyebrow">UN ENSAYO VISUAL SOBRE</p>
-      <h1 class="hero-title">El Séptimo<br><em>Arte</em></h1>
-      <p class="hero-subtitle">Cine: memoria viva de la historia, latido eterno del entretenimiento</p>
-      <div class="hero-meta">
-        <span>Por <strong>César Luis Guerra Romero</strong></span>
-        <span class="dot">•</span>
-        <span>Edición especial</span>
+<main>
+
+  <!-- ============ SECCIÓN 1: BIENVENIDA Y DATOS DEL ESTUDIANTE ============ -->
+  <section id="seccion-datos" class="seccion activa">
+    <h2>Bienvenido al Simulador Vocacional</h2>
+    <p class="subtitulo">Este programa te ayudará a explorar las áreas profesionales con las que tienes mayor afinidad, consultar carreras y buscar universidades en Colombia. Recuerda: los resultados son una guía para explorar opciones, no una decisión definitiva sobre tu futuro.</p>
+
+    <div class="aviso info">
+      <strong>Importante:</strong> Antes de iniciar el test, completa tus datos básicos. Esta información se usará para filtrar las universidades que mejor se ajusten a tu perfil.
+    </div>
+
+    <h3>Datos del estudiante</h3>
+    <div class="form-grid">
+      <div class="campo">
+        <label for="nombre">Nombre completo <span class="req">*</span></label>
+        <input type="text" id="nombre" placeholder="Ej: Juan Pérez" autocomplete="name">
+      </div>
+      <div class="campo">
+        <label for="edad">Edad <span class="req">*</span></label>
+        <input type="number" id="edad" min="14" max="80" placeholder="Ej: 17">
+      </div>
+      <div class="campo">
+        <label for="ciudad">Ciudad donde desea estudiar <span class="req">*</span></label>
+        <select id="ciudad">
+          <option value="">Selecciona una ciudad...</option>
+          <option value="bogota">Bogotá D.C.</option>
+          <option value="medellin">Medellín</option>
+          <option value="cali">Cali</option>
+          <option value="barranquilla">Barranquilla</option>
+          <option value="bucaramanga">Bucaramanga</option>
+          <option value="cartagena">Cartagena</option>
+          <option value="manizales">Manizales</option>
+          <option value="pereira">Pereira</option>
+          <option value="ibague">Ibagué</option>
+          <option value="chia">Chía / Cundinamarca</option>
+          <option value="cualquiera">Cualquiera / Sin preferencia</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="tipo-universidad">Tipo de universidad preferida <span class="req">*</span></label>
+        <select id="tipo-universidad">
+          <option value="cualquiera">Cualquiera (pública o privada)</option>
+          <option value="publica">Pública</option>
+          <option value="privada">Privada</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label for="presupuesto">Presupuesto anual para matrícula (COP) <span class="req">*</span></label>
+        <select id="presupuesto">
+          <option value="">Selecciona un rango...</option>
+          <option value="5000000">Hasta $5.000.000 (pública)</option>
+          <option value="10000000">Hasta $10.000.000</option>
+          <option value="15000000">Hasta $15.000.000</option>
+          <option value="20000000">Hasta $20.000.000</option>
+          <option value="25000000">Hasta $25.000.000</option>
+          <option value="999999999">Sin límite de presupuesto</option>
+        </select>
+        <span class="ayuda">Valor anual aproximado de matrícula en pesos colombianos.</span>
+      </div>
+      <div class="campo">
+        <label for="modalidad">Modalidad preferida <span class="req">*</span></label>
+        <select id="modalidad">
+          <option value="cualquiera">Cualquiera</option>
+          <option value="presencial">Presencial</option>
+          <option value="virtual">Virtual / a distancia</option>
+        </select>
+      </div>
+      <div class="campo full">
+        <label for="saber11">Puntaje de Saber 11 (opcional)</label>
+        <input type="number" id="saber11" min="0" max="500" placeholder="Ej: 320 (déjalo en blanco si no quieres usarlo)">
+        <span class="ayuda">Si lo ingresas, se usará como referencia para las universidades que exigen puntaje mínimo.</span>
       </div>
     </div>
-    <a href="#intro" class="scroll-indicator" aria-label="Bajar a la introducción">
-      <span>Comenzar</span>
-      <i class="fas fa-chevron-down"></i>
-    </a>
-  </header>
 
-  <!-- INTRODUCCIÓN -->
-  <section class="section intro" id="intro">
-    <div class="container">
-      <div class="intro-text reveal">
-        <p>Desde que los hermanos Lumière sorprendieron a un puñado de espectadores en un café de París en <strong>1895</strong>, el cine dejó de ser una simple curiosidad técnica para convertirse en el lenguaje que define cómo nos contamos a nosotros mismos.</p>
-        <p>Más que entretenimiento, es el espejo donde la humanidad se mira, se cuestiona y se reinventa. Cada plano, cada corte, cada silencio en una sala oscura es un fragmento de alma colectiva preservado en celuloide —y ahora en bits— para las generaciones que aún no han nacido.</p>
-      </div>
-
-      <div class="intro-quote reveal">
-        El cine es la vida con las partes aburridas cortadas.
-      </div>
-      <div class="intro-quote-author reveal">— Alfred Hitchcock</div>
-    </div>
-  </section>
-
-  <!-- LÍNEA DE TIEMPO -->
-  <section class="section timeline-section" id="historia">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">Línea de tiempo</span>
-        <h2 class="section-title">Hitos que <em>cambiaron</em> la pantalla</h2>
-        <p class="section-subtitle">Un recorrido por los momentos que redefinieron el lenguaje cinematográfico</p>
-      </div>
-
-      <div class="timeline-grid">
-        <article class="timeline-card reveal">
-          <i class="fas fa-film timeline-icon"></i>
-          <div class="timeline-year">1895</div>
-          <h3 class="timeline-title">El nacimiento</h3>
-          <p class="timeline-desc">Los hermanos Lumière proyectan las primeras películas en París. El tren que llegaba a la estación hizo que el público se agachara en sus butacas, creyendo que los atropellaría.</p>
-        </article>
-
-        <article class="timeline-card reveal">
-          <i class="fas fa-volume-high timeline-icon"></i>
-          <div class="timeline-year">1927</div>
-          <h3 class="timeline-title">Llega el sonido</h3>
-          <p class="timeline-desc">"El cantante de jazz" marca el fin del cine mudo. Las palabras se vuelven inmortales y el cine gana una nueva dimensión sensorial que transformaría el arte para siempre.</p>
-        </article>
-
-        <article class="timeline-card reveal">
-          <i class="fas fa-palette timeline-icon"></i>
-          <div class="timeline-year">1939</div>
-          <h3 class="timeline-title">Technicolor deslumbra</h3>
-          <p class="timeline-desc">"Lo que el viento se llevó" y "El mago de Oz" demuestran que el color puede contar historias tan potentes como la luz, abriendo una era visualmente deslumbrante.</p>
-        </article>
-
-        <article class="timeline-card reveal">
-          <i class="fas fa-mountain timeline-icon"></i>
-          <div class="timeline-year">1941</div>
-          <h3 class="timeline-title">Ciudadano Kane</h3>
-          <p class="timeline-desc">Orson Welles revoluciona la profundidad de campo y la narrativa no lineal. El cine descubre que puede ser arte mayor y no solo espectáculo popular.</p>
-        </article>
-
-        <article class="timeline-card reveal">
-          <i class="fas fa-rocket timeline-icon"></i>
-          <div class="timeline-year">1977</div>
-          <h3 class="timeline-title">La era blockbuster</h3>
-          <p class="timeline-desc">"Star Wars" inventa el evento cinematográfico global. El cine se convierte en fenómeno cultural compartido simultáneamente por millones de personas.</p>
-        </article>
-
-        <article class="timeline-card reveal">
-          <i class="fas fa-cube timeline-icon"></i>
-          <div class="timeline-year">1995</div>
-          <h3 class="timeline-title">La era digital</h3>
-          <p class="timeline-desc">"Toy Story" es la primera película completamente generada por computadora. Comienza una nueva forma de hacer cine que hoy domina gran parte de la industria.</p>
-        </article>
-
-        <article class="timeline-card reveal">
-          <i class="fas fa-glasses timeline-icon"></i>
-          <div class="timeline-year">2009</div>
-          <h3 class="timeline-title">Avatar y el 3D</h3>
-          <p class="timeline-desc">James Cameron reaviva el 3D estereoscópico y demuestra que la tecnología puede expandir los límites de la inmersión narrativa del espectador.</p>
-        </article>
-
-        <article class="timeline-card reveal">
-          <i class="fas fa-tv timeline-icon"></i>
-          <div class="timeline-year">Hoy</div>
-          <h3 class="timeline-title">Streaming y más allá</h3>
-          <p class="timeline-desc">Las plataformas digitales transforman el acceso al cine. El séptimo arte se multiplica en pantallas de todos los tamaños, llegando a cada rincón del planeta.</p>
-        </article>
-      </div>
+    <div class="botones">
+      <span></span>
+      <button onclick="iniciarTest()">Comenzar test vocacional →</button>
     </div>
   </section>
 
-  <!-- IMPORTANCIA HISTÓRICA -->
-  <section class="section importance-section" id="importancia">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">Por qué importa</span>
-        <h2 class="section-title">El cine como <em>memoria</em> del mundo</h2>
-        <p class="section-subtitle">Seis formas en que las películas han moldeado nuestra historia colectiva</p>
-      </div>
+  <!-- ============ SECCIÓN 2: TEST VOCACIONAL ============ -->
+  <section id="seccion-test" class="seccion">
+    <h2>Test de Orientación Vocacional</h2>
+    <p class="subtitulo">Responde las 70 afirmaciones usando una escala del 1 al 5, donde 1 = "Nada me identifica" y 5 = "Me identifica totalmente". Sé honesto/a para obtener resultados confiables.</p>
 
-      <div class="importance-grid">
-        <article class="importance-card reveal">
-          <div class="importance-number">01</div>
-          <i class="fas fa-landmark importance-icon"></i>
-          <h3 class="importance-title">Documento histórico</h3>
-          <p class="importance-desc">Cada película es un documento de su época: registra cómo se vestía, cómo se hablaba, qué se temía y qué se deseaba. Ver cine antiguo es viajar en el tiempo sin moverse de la butaca.</p>
-        </article>
+    <div class="progreso-contenedor">
+      <div class="progreso-barra" id="progreso-barra"></div>
+    </div>
+    <div class="progreso-texto" id="progreso-texto">Pregunta 1 de 70</div>
 
-        <article class="importance-card reveal">
-          <div class="importance-number">02</div>
-          <i class="fas fa-eye importance-icon"></i>
-          <h3 class="importance-title">Espejo social</h3>
-          <p class="importance-desc">El cine refleja las tensiones de su tiempo: guerras, revoluciones, cambios morales. Lo que la sociedad no se atreve a decir en voz alta, el cine lo pone en pantalla para todos.</p>
-        </article>
+    <div id="contenedor-preguntas"></div>
 
-        <article class="importance-card reveal">
-          <div class="importance-number">03</div>
-          <i class="fas fa-heart importance-icon"></i>
-          <h3 class="importance-title">Máquina de empatía</h3>
-          <p class="importance-desc">Pocas cosas nos permiten vivir vidas ajenas como el cine. Por dos horas somos otros, sentimos lo que sienten, comprendemos lo que sufren, amamos lo que aman.</p>
-        </article>
-
-        <article class="importance-card reveal">
-          <div class="importance-number">04</div>
-          <i class="fas fa-globe importance-icon"></i>
-          <h3 class="importance-title">Memoria colectiva</h3>
-          <p class="importance-desc">Frases, imágenes y melodías que reconocemos sin haberlas estudiado. El cine crea un acervo común que trasciende fronteras, idiomas y generaciones enteras.</p>
-        </article>
-
-        <article class="importance-card reveal">
-          <div class="importance-number">05</div>
-          <i class="fas fa-comment-dots importance-icon"></i>
-          <h3 class="importance-title">Crónica visual</h3>
-          <p class="importance-desc">Antes de internet, el cine era la ventana al mundo. Documentales y ficciones nos mostraron lugares, culturas y realidades que de otro modo habrían permanecido invisibles.</p>
-        </article>
-
-        <article class="importance-card reveal">
-          <div class="importance-number">06</div>
-          <i class="fas fa-bullseye importance-icon"></i>
-          <h3 class="importance-title">Conciencia global</h3>
-          <p class="importance-desc">Desde "La lista de Schindler" hasta "Una verdad incómoda", el cine ha movido conciencias, despertado indignación y provocado cambios reales en el mundo.</p>
-        </article>
-      </div>
+    <div class="botones">
+      <button class="secundario" onclick="volverADatos()">← Volver a mis datos</button>
+      <button id="btn-calcular" disabled onclick="calcularResultados()">Calcular mis resultados →</button>
     </div>
   </section>
 
-  <!-- ENTRETENIMIENTO -->
-  <section class="section entertainment-section" id="entretenimiento">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">El lado brillante</span>
-        <h2 class="section-title">Pura <em>magia</em> de entretenimiento</h2>
-      </div>
+  <!-- ============ SECCIÓN 3: RESULTADOS ============ -->
+  <section id="seccion-resultados" class="seccion">
+    <h2>Tus resultados vocacionales</h2>
+    <p class="subtitulo">A continuación se muestran tus porcentajes de afinidad con cada una de las 7 áreas profesionales, ordenadas de mayor a menor. Las tres áreas con mayor puntaje aparecen destacadas con una estrella.</p>
 
-      <div class="entertainment-layout">
-        <div class="entertainment-visual reveal">
-          <div class="projector-beam"></div>
-          <div class="film-reel-small"></div>
-          <div class="film-reel"></div>
-          <div class="screen-text">CINE</div>
+    <div class="resultado-resumen" id="resultado-resumen"></div>
+
+    <h3>Tus tres áreas con mayor afinidad</h3>
+    <div id="top-areas"></div>
+
+    <h3>Todas las áreas (rankings completos)</h3>
+    <div id="todas-areas"></div>
+
+    <div class="aviso info">
+      <strong>Carreras sugeridas:</strong> Debajo de cada área encontrarás algunas carreras relacionadas. Estas te servirán como punto de partida para explorar programas académicos en la siguiente sección.
+    </div>
+
+    <div class="botones">
+      <button class="secundario" onclick="reiniciarTest()">← Repetir el test</button>
+      <button onclick="irAUniversidades()">Buscar universidades para mis carreras →</button>
+    </div>
+  </section>
+
+  <!-- ============ SECCIÓN 4: UNIVERSIDADES ============ -->
+  <section id="seccion-universidades" class="seccion">
+    <h2>Consulta de universidades</h2>
+    <p class="subtitulo">Aquí puedes buscar universidades reales de Colombia que ofrezcan carreras en tus áreas de afinidad. Hemos precargado los filtros con tus preferencias, pero puedes modificarlos en cualquier momento.</p>
+
+    <div class="filtros-panel">
+      <h3>Filtros de búsqueda</h3>
+      <div class="form-grid">
+        <div class="campo">
+          <label for="filtro-area">Área de interés</label>
+          <select id="filtro-area">
+            <option value="">Todas las áreas</option>
+            <option value="Ingeniería">Ingeniería</option>
+            <option value="Ciencias y Matemáticas">Ciencias y Matemáticas</option>
+            <option value="Ciencias de la Salud">Ciencias de la Salud</option>
+            <option value="Administración y Negocios">Administración y Negocios</option>
+            <option value="Educación">Educación</option>
+            <option value="Derecho y Ciencias Sociales">Derecho y Ciencias Sociales</option>
+            <option value="Arte y Diseño">Arte y Diseño</option>
+          </select>
         </div>
-        <div class="entertainment-text reveal">
-          <h3>Donde la luz se convierte en <em>emoción</em></h3>
-          <p>El cine es, antes que nada, una de las formas más puras de entretenimiento jamás inventadas. En una sala oscura, extraños comparten risas, lágrimas y suspiros al unísono, unidos por la misma historia durante dos horas.</p>
-          <p>Es evasión y encuentro, fantasía y reflejo. Desde el blockbuster de verano hasta la película independiente de festival, cada filme es una invitación a dejar atrás el mundo y regresar transformado.</p>
-
-          <div class="entertainment-stats">
-            <div>
-              <div class="stat-value">130+</div>
-              <div class="stat-label">Años de historia</div>
-            </div>
-            <div>
-              <div class="stat-value">50K</div>
-              <div class="stat-label">Películas por año</div>
-            </div>
-            <div>
-              <div class="stat-value">$100B</div>
-              <div class="stat-label">Industria global</div>
-            </div>
-          </div>
+        <div class="campo">
+          <label for="filtro-ciudad">Ciudad</label>
+          <select id="filtro-ciudad">
+            <option value="">Todas</option>
+            <option value="bogota">Bogotá D.C.</option>
+            <option value="medellin">Medellín</option>
+            <option value="cali">Cali</option>
+            <option value="barranquilla">Barranquilla</option>
+            <option value="bucaramanga">Bucaramanga</option>
+            <option value="cartagena">Cartagena</option>
+            <option value="manizales">Manizales</option>
+            <option value="pereira">Pereira</option>
+            <option value="ibague">Ibagué</option>
+            <option value="chia">Chía / Cundinamarca</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="filtro-tipo">Tipo de institución</label>
+          <select id="filtro-tipo">
+            <option value="">Todas</option>
+            <option value="publica">Pública</option>
+            <option value="privada">Privada</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="filtro-modalidad">Modalidad</label>
+          <select id="filtro-modalidad">
+            <option value="">Todas</option>
+            <option value="presencial">Presencial</option>
+            <option value="virtual">Virtual / a distancia</option>
+          </select>
+        </div>
+        <div class="campo">
+          <label for="filtro-presupuesto">Presupuesto máximo (COP)</label>
+          <select id="filtro-presupuesto">
+            <option value="">Sin límite</option>
+            <option value="5000000">Hasta $5.000.000</option>
+            <option value="10000000">Hasta $10.000.000</option>
+            <option value="15000000">Hasta $15.000.000</option>
+            <option value="20000000">Hasta $20.000.000</option>
+            <option value="25000000">Hasta $25.000.000</option>
+          </select>
         </div>
       </div>
+      <div style="margin-top: 16px;">
+        <button onclick="buscarUniversidades()">Buscar universidades</button>
+        <button class="secundario" onclick="limpiarFiltros()">Limpiar filtros</button>
+      </div>
+    </div>
+
+    <div id="contenedor-universidades"></div>
+
+    <div class="botones no-imprimir">
+      <button class="secundario" onclick="mostrarSeccion('seccion-resultados')">← Volver a resultados</button>
+      <button onclick="irABecas()">Ver becas y financiación (ICETEX) →</button>
     </div>
   </section>
 
-  <!-- JUEGO INTERACTIVO -->
-  <section class="section game-section" id="juego">
-    <div class="container">
-      <div class="section-header reveal">
-        <span class="section-label">Ahora te toca</span>
-        <h2 class="section-title">Pon a prueba tu <em>mirada</em></h2>
-        <p class="section-subtitle">¿Cuánto sabes del séptimo arte? Atrévete a jugar</p>
-      </div>
+  <!-- ============ SECCIÓN 5: BECAS Y FINANCIACIÓN ICETEX ============ -->
+  <section id="seccion-becas" class="seccion">
+    <h2>Becas, convenios y financiación</h2>
+    <p class="subtitulo">A continuación se presentan las principales alternativas de financiación educativa del ICETEX vigentes para estudiantes de educación superior en Colombia. Esta información es referencial; te recomendamos verificar detalles directamente en <strong>www.icetex.gov.co</strong>.</p>
 
-      <div class="game-frame reveal">
-        <div class="game-curtain left"></div>
-        <div class="game-curtain right"></div>
-        <div class="game-screen">
-          <div class="game-iframe-wrapper">
-            <iframe src="https://wordwall.net/es/embed/f756f5089da548d6879f61cd5b4272e7?themeId=1&templateId=5&fontStackId=0" width="100%" height="380" frameborder="0" allowfullscreen></iframe>
-          </div>
-        </div>
-      </div>
+    <div class="aviso info">
+      <strong>¿Sabías que...?</strong> El ICETEX (Instituto Colombiano de Crédito Educativo y Estudios Técnicos en el Exterior) es la entidad estatal que ofrece crédito educativo, becas y subsidios a estudiantes colombianos. No todas las opciones son compatibles con todas las universidades, así que verifica la lista de instituciones beneficiarias antes de aplicar.
+    </div>
 
-      <p class="game-hint reveal"><i class="fas fa-clapperboard"></i> Toca, arrastra y descubre cuánto cine habita en ti</p>
+    <div id="contenedor-becas"></div>
+
+    <h3>Recomendaciones para postular</h3>
+    <div class="beca-card">
+      <ul>
+        <li><strong>Mantén buen rendimiento académico:</strong> La mayoría de becas y créditos condonables exigen un promedio mínimo (generalmente 3.5 o superior).</li>
+        <li><strong>Prepara tu documentación:</strong> Documento de identidad, certificados de notas, comprobante de inscripción o admisión, y declaración de renta familiar (para evaluación socioeconómica).</li>
+        <li><strong>Inscríbete en el Sisbén IV:</strong> La mayoría de programas del Estado requieren estar registrado y clasificado.</li>
+        <li><strong>Está atento a las convocatorias:</strong> Las becas-condonables y créditos ACCES abren convocatorias semestrales, generalmente entre septiembre y enero.</li>
+        <li><strong>Busca convenios locales:</strong> Muchas gobernaciones y alcaldías ofrecen créditos complementarios o becas para estudiantes de su municipio.</li>
+      </ul>
+    </div>
+
+    <div class="botones no-imprimir">
+      <button class="secundario" onclick="mostrarSeccion('seccion-universidades')">← Volver a universidades</button>
+      <button class="dorado" onclick="generarReportePDF()">⬇ Descargar reporte completo (PDF)</button>
     </div>
   </section>
 
-  <!-- AUTOR -->
-  <section class="author-section" id="autor">
-    <div class="author-grid">
-      <div class="author-avatar reveal">C</div>
-      <div class="author-info reveal">
-        <span class="section-label">El autor</span>
-        <h2 class="author-name">César Luis <em>Guerra</em><br>Romero</h2>
-        <p class="author-role">Creador · Cinéfilo · Cronista</p>
-        <p class="author-bio">Apasionado por las historias que solo el cine puede contar. Esta página es un homenaje a ese arte que combina luz, tiempo y emoción para hacernos sentir, aunque sea por un instante, que todo es posible. Porque cada película es una vida vivida y, al mismo tiempo, infinitas vidas por descubrir.</p>
-      </div>
-    </div>
-  </section>
+</main>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-content">
-      <p class="footer-quote">"El cine es una industria, pero también un arte. Y como todo arte, merece ser celebrado."</p>
-      <p class="footer-meta">© <span class="gold">César Luis Guerra Romero</span> · Una página dedicada al séptimo arte · Hecha con luz, música y celuloide</p>
-    </div>
-  </footer>
+<footer>
+  <p><strong>Simulador de Orientación Vocacional y Ruta Universitaria</strong> · Proyecto de Programación · Grado 11°</p>
+  <p>Los resultados de este simulador son orientacionales y no constituyen una decisión definitiva sobre tu futuro profesional.</p>
+</footer>
 
 <script>
-  // Apertura de cortinas al cargar
-  window.addEventListener('load', () => {
-    setTimeout(() => document.body.classList.add('loaded'), 150);
-  });
+/* =========================================================
+   DATOS DEL PROYECTO
+   ========================================================= */
 
-  // Efecto spotlight en el hero siguiendo el cursor
-  const hero = document.getElementById('hero');
-  hero.addEventListener('mousemove', (e) => {
-    const rect = hero.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100;
-    const y = ((e.clientY - rect.top) / rect.height) * 100;
-    hero.style.setProperty('--mx', `${x}%`);
-    hero.style.setProperty('--my', `${y}%`);
-  });
+// 7 áreas profesionales con sus carreras asociadas
+const AREAS = {
+  "Ingeniería": {
+    carreras: [
+      "Ingeniería de Sistemas", "Ingeniería de Software", "Ingeniería Electrónica",
+      "Ingeniería Civil", "Ingeniería Industrial", "Ingeniería Mecánica",
+      "Ingeniería Química", "Ingeniería Eléctrica", "Ingeniería de Telecomunicaciones",
+      "Ingeniería Biomédica", "Ingeniería Ambiental", "Ingeniería Mecatrónica",
+      "Ingeniería de Alimentos", "Ingeniería de Petróleos"
+    ]
+  },
+  "Ciencias y Matemáticas": {
+    carreras: [
+      "Matemáticas", "Física", "Química", "Biología", "Estadística",
+      "Ciencia de Datos", "Astronomía", "Microbiología", "Geología", "Oceanografía"
+    ]
+  },
+  "Ciencias de la Salud": {
+    carreras: [
+      "Medicina", "Enfermería", "Odontología", "Psicología", "Fisioterapia",
+      "Nutrición y Dietética", "Bacteriología", "Farmacia", "Terapia Ocupacional",
+      "Fonoaudiología", "Optometría", "Medicina Veterinaria"
+    ]
+  },
+  "Administración y Negocios": {
+    carreras: [
+      "Administración de Empresas", "Contaduría Pública", "Economía", "Mercadeo",
+      "Negocios Internacionales", "Finanzas", "Administración Pública",
+      "Comercio Internacional", "Administración Agropecuaria", "Logística y Cadenas de Suministro"
+    ]
+  },
+  "Educación": {
+    carreras: [
+      "Licenciatura en Educación Básica", "Licenciatura en Matemáticas",
+      "Licenciatura en Español y Literatura", "Licenciatura en Ciencias Sociales",
+      "Licenciatura en Ciencias Naturales", "Licenciatura en Inglés",
+      "Licenciatura en Educación Física", "Licenciatura en Informática",
+      "Licenciatura en Educación Infantil", "Pedagogía"
+    ]
+  },
+  "Derecho y Ciencias Sociales": {
+    carreras: [
+      "Derecho", "Ciencia Política", "Sociología", "Trabajo Social",
+      "Comunicación Social y Periodismo", "Relaciones Internacionales",
+      "Antropología", "Historia", "Filosofía", "Criminología"
+    ]
+  },
+  "Arte y Diseño": {
+    carreras: [
+      "Arquitectura", "Diseño Gráfico", "Diseño Industrial", "Bellas Artes",
+      "Música", "Arte Dramático", "Cine y Comunicación Audiovisual", "Danza",
+      "Diseño de la Comunicación Gráfica", "Fotografía"
+    ]
+  }
+};
 
-  // Partículas de polvo de proyector (canvas)
-  const canvas = document.getElementById('dust-canvas');
-  const ctx = canvas.getContext('2d');
-  let particles = [];
+// 70 preguntas (10 por área) - cada una mapea a su área
+const PREGUNTAS = [
+  // ---- INGENIERÍA (1-10) ----
+  { area: "Ingeniería", texto: "Me gusta resolver problemas utilizando computadores o tecnología." },
+  { area: "Ingeniería", texto: "Me interesa aprender cómo funcionan las aplicaciones, programas y sistemas digitales." },
+  { area: "Ingeniería", texto: "Me gusta construir, reparar o diseñar objetos y dispositivos." },
+  { area: "Ingeniería", texto: "Me llaman la atención los circuitos, sensores, robots o sistemas electrónicos." },
+  { area: "Ingeniería", texto: "Disfruto diseñando o imaginando puentes, edificios o estructuras." },
+  { area: "Ingeniería", texto: "Me emociona pensar en cómo optimizar procesos industriales o de producción." },
+  { area: "Ingeniería", texto: "Me gustaría programar aplicaciones móviles o páginas web." },
+  { area: "Ingeniería", texto: "Me interesa el funcionamiento de motores, máquinas y sistemas mecánicos." },
+  { area: "Ingeniería", texto: "Disfruto trabajando con herramientas, materiales y equipos técnicos." },
+  { area: "Ingeniería", texto: "Me atrae la idea de diseñar sistemas que mejoren la calidad de vida de las personas." },
 
-  function resizeCanvas() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
+  // ---- CIENCIAS Y MATEMÁTICAS (11-20) ----
+  { area: "Ciencias y Matemáticas", texto: "Me gusta analizar información y encontrar patrones en los datos." },
+  { area: "Ciencias y Matemáticas", texto: "Disfruto resolviendo problemas matemáticos complejos." },
+  { area: "Ciencias y Matemáticas", texto: "Me interesa entender las leyes que rigen el universo y la materia." },
+  { area: "Ciencias y Matemáticas", texto: "Me fascina estudiar los seres vivos y cómo funcionan a nivel celular." },
+  { area: "Ciencias y Matemáticas", texto: "Me gustaría investigar en laboratorios y hacer experimentos." },
+  { area: "Ciencias y Matemáticas", texto: "Disfruto leyendo sobre descubrimientos científicos y avances tecnológicos." },
+  { area: "Ciencias y Matemáticas", texto: "Me interesa el estudio del espacio, los planetas y las estrellas." },
+  { area: "Ciencias y Matemáticas", texto: "Me gusta hacer cálculos precisos y trabajar con números." },
+  { area: "Ciencias y Matemáticas", texto: "Me llama la atención la química y cómo se combinan las sustancias." },
+  { area: "Ciencias y Matemáticas", texto: "Disfruto planteando hipótesis y comprobándolas con evidencia." },
+
+  // ---- CIENCIAS DE LA SALUD (21-30) ----
+  { area: "Ciencias de la Salud", texto: "Me interesa cuidar la salud de las personas y ayudarlas a recuperarse." },
+  { area: "Ciencias de la Salud", texto: "Me gustaría trabajar en un hospital o centro médico." },
+  { area: "Ciencias de la Salud", texto: "Disfruto aprendiendo sobre el cuerpo humano y su funcionamiento." },
+  { area: "Ciencias de la Salud", texto: "Me llama la atención estudiar enfermedades y cómo tratarlas." },
+  { area: "Ciencias de la Salud", texto: "Me gustaría ser médico o enfermero para ayudar a quienes lo necesitan." },
+  { area: "Ciencias de la Salud", texto: "Me interesa la nutrición y cómo los alimentos afectan la salud." },
+  { area: "Ciencias de la Salud", texto: "Disfruto cuidando a personas enfermas o que necesitan atención." },
+  { area: "Ciencias de la Salud", texto: "Me gustaría participar en campañas de salud pública." },
+  { area: "Ciencias de la Salud", texto: "Me llama la atención la odontología y el cuidado bucal." },
+  { area: "Ciencias de la Salud", texto: "Me interesaría investigar tratamientos para mejorar la calidad de vida." },
+
+  // ---- ADMINISTRACIÓN Y NEGOCIOS (31-40) ----
+  { area: "Administración y Negocios", texto: "Me gusta la idea de crear mi propia empresa o negocio." },
+  { area: "Administración y Negocios", texto: "Disfruto organizando y planificando actividades o eventos." },
+  { area: "Administración y Negocios", texto: "Me interesa aprender cómo funcionan las empresas y sus finanzas." },
+  { area: "Administración y Negocios", texto: "Me gusta liderar grupos y tomar decisiones importantes." },
+  { area: "Administración y Negocios", texto: "Me emociona pensar en estrategias para vender productos o servicios." },
+  { area: "Administración y Negocios", texto: "Me interesa el comercio internacional y los negocios entre países." },
+  { area: "Administración y Negocios", texto: "Disfruto llevando cuentas, presupuestos o registros financieros." },
+  { area: "Administración y Negocios", texto: "Me gustaría trabajar en un banco o entidad financiera." },
+  { area: "Administración y Negocios", texto: "Me llama la atención el mercadeo y la publicidad." },
+  { area: "Administración y Negocios", texto: "Me interesa la economía y cómo se mueve el dinero en el mundo." },
+
+  // ---- EDUCACIÓN (41-50) ----
+  { area: "Educación", texto: "Me gusta enseñar a otros lo que sé." },
+  { area: "Educación", texto: "Disfruto explicando temas difíciles para que otros los entiendan." },
+  { area: "Educación", texto: "Me interesa trabajar con niños o adolescentes en su formación." },
+  { area: "Educación", texto: "Me emociona pensar en ser profesor algún día." },
+  { area: "Educación", texto: "Me gusta diseñar actividades didácticas o materiales educativos." },
+  { area: "Educación", texto: "Disfruto ayudando a mis compañeros cuando no entienden algo." },
+  { area: "Educación", texto: "Me interesa la pedagogía y las nuevas formas de enseñar." },
+  { area: "Educación", texto: "Me llama la atención la educación infantil y el desarrollo temprano." },
+  { area: "Educación", texto: "Me gustaría contribuir a mejorar la educación en mi país." },
+  { area: "Educación", texto: "Disfruto leyendo sobre cómo aprenden las personas." },
+
+  // ---- DERECHO Y CIENCIAS SOCIALES (51-60) ----
+  { area: "Derecho y Ciencias Sociales", texto: "Me interesa conocer las leyes y cómo se aplican en la sociedad." },
+  { area: "Derecho y Ciencias Sociales", texto: "Me gusta debatir y defender mis ideas con argumentos." },
+  { area: "Derecho y Ciencias Sociales", texto: "Me llama la atención la política y cómo se gobierna un país." },
+  { area: "Derecho y Ciencias Sociales", texto: "Me emociona pensar en defender los derechos de las personas." },
+  { area: "Derecho y Ciencias Sociales", texto: "Me interesa estudiar la historia y cómo se han formado las sociedades." },
+  { area: "Derecho y Ciencias Sociales", texto: "Disfruto leyendo sobre problemas sociales y buscando soluciones." },
+  { area: "Derecho y Ciencias Sociales", texto: "Me gustaría trabajar en temas de justicia y equidad." },
+  { area: "Derecho y Ciencias Sociales", texto: "Me interesa la sociología y el comportamiento de los grupos humanos." },
+  { area: "Derecho y Ciencias Sociales", texto: "Me llama la atención el trabajo social y ayudar a comunidades vulnerables." },
+  { area: "Derecho y Ciencias Sociales", texto: "Disfruto analizando noticias y eventos de actualidad." },
+
+  // ---- ARTE Y DISEÑO (61-70) ----
+  { area: "Arte y Diseño", texto: "Me gusta dibujar, pintar o crear cosas con mis manos." },
+  { area: "Arte y Diseño", texto: "Disfruto diseñando imágenes, logos o material visual." },
+  { area: "Arte y Diseño", texto: "Me interesa la música y me gustaría aprender a tocar un instrumento." },
+  { area: "Arte y Diseño", texto: "Me llama la atención el cine, el teatro o las artes escénicas." },
+  { area: "Arte y Diseño", texto: "Me emociona pensar en diseñar espacios, muebles o productos." },
+  { area: "Arte y Diseño", texto: "Me gusta la fotografía y la edición de imágenes." },
+  { area: "Arte y Diseño", texto: "Disfruto bailando o participando en actividades artísticas." },
+  { area: "Arte y Diseño", texto: "Me interesa la arquitectura y el diseño de edificios." },
+  { area: "Arte y Diseño", texto: "Me gusta expresar mis emociones a través del arte." },
+  { area: "Arte y Diseño", texto: "Me llama la atención la animación y el diseño digital." }
+];
+
+// Universidades reales colombianas con sus datos
+// carrerasOfrecidas: lista de áreas atendidas (las carreras específicas se muestran genéricamente por área)
+const UNIVERSIDADES = [
+  { nombre: "Universidad Nacional de Colombia", tipo: "publica", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 5000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad Nacional de Colombia - Sede Medellín", tipo: "publica", ciudad: "medellin", ciudadNombre: "Medellín",
+    modalidad: "presencial", matricula: 5000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Arte y Diseño"] },
+  { nombre: "Universidad Nacional de Colombia - Sede Manizales", tipo: "publica", ciudad: "manizales", ciudadNombre: "Manizales",
+    modalidad: "presencial", matricula: 5000000, areas: ["Ingeniería","Ciencias y Matemáticas","Administración y Negocios","Educación"] },
+  { nombre: "Universidad de los Andes", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 28000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Pontificia Universidad Javeriana", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 24000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Pontificia Universidad Javeriana - Sede Cali", tipo: "privada", ciudad: "cali", ciudadNombre: "Cali",
+    modalidad: "presencial", matricula: 22000000, areas: ["Ingeniería","Ciencias de la Salud","Administración y Negocios","Derecho y Ciencias Sociales"] },
+  { nombre: "Universidad de Antioquia", tipo: "publica", ciudad: "medellin", ciudadNombre: "Medellín",
+    modalidad: "presencial", matricula: 5000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad del Valle", tipo: "publica", ciudad: "cali", ciudadNombre: "Cali",
+    modalidad: "presencial", matricula: 4500000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad Industrial de Santander", tipo: "publica", ciudad: "bucaramanga", ciudadNombre: "Bucaramanga",
+    modalidad: "presencial", matricula: 5000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales"] },
+  { nombre: "Universidad del Norte", tipo: "privada", ciudad: "barranquilla", ciudadNombre: "Barranquilla",
+    modalidad: "presencial", matricula: 22000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales"] },
+  { nombre: "Universidad ICESI", tipo: "privada", ciudad: "cali", ciudadNombre: "Cali",
+    modalidad: "presencial", matricula: 20000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Derecho y Ciencias Sociales"] },
+  { nombre: "Universidad EAFIT", tipo: "privada", ciudad: "medellin", ciudadNombre: "Medellín",
+    modalidad: "presencial", matricula: 24000000, areas: ["Ingeniería","Ciencias y Matemáticas","Administración y Negocios","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad de la Sabana", tipo: "privada", ciudad: "chia", ciudadNombre: "Chía / Cundinamarca",
+    modalidad: "presencial", matricula: 24000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad Externado de Colombia", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 22000000, areas: ["Ciencias y Matemáticas","Administración y Negocios","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad del Rosario", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 22000000, areas: ["Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Derecho y Ciencias Sociales"] },
+  { nombre: "Universidad Pedagógica Nacional", tipo: "publica", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 4000000, areas: ["Educación","Ciencias y Matemáticas","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad Distrital Francisco José de Caldas", tipo: "publica", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 4000000, areas: ["Ingeniería","Ciencias y Matemáticas","Educación","Arte y Diseño"] },
+  { nombre: "Universidad Tecnológica de Bolívar", tipo: "privada", ciudad: "cartagena", ciudadNombre: "Cartagena",
+    modalidad: "presencial", matricula: 18000000, areas: ["Ingeniería","Ciencias y Matemáticas","Administración y Negocios","Derecho y Ciencias Sociales","Educación"] },
+  { nombre: "Universidad de Caldas", tipo: "publica", ciudad: "manizales", ciudadNombre: "Manizales",
+    modalidad: "presencial", matricula: 4000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad del Tolima", tipo: "publica", ciudad: "ibague", ciudadNombre: "Ibagué",
+    modalidad: "presencial", matricula: 4000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad Autónoma de Occidente", tipo: "privada", ciudad: "cali", ciudadNombre: "Cali",
+    modalidad: "presencial", matricula: 18000000, areas: ["Ingeniería","Ciencias y Matemáticas","Administración y Negocios","Arte y Diseño"] },
+  { nombre: "Universidad El Bosque", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 22000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Educación","Arte y Diseño"] },
+  { nombre: "Fundación Universitaria Konrad Lorenz", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 18000000, areas: ["Administración y Negocios","Derecho y Ciencias Sociales","Educación"] },
+  { nombre: "Universidad Sergio Arboleda", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 18000000, areas: ["Ingeniería","Ciencias y Matemáticas","Administración y Negocios","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Politécnico Grancolombiano", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "virtual", matricula: 14000000, areas: ["Ingeniería","Administración y Negocios","Derecho y Ciencias Sociales","Educación"] },
+  { nombre: "Universidad Cooperativa de Colombia", tipo: "privada", ciudad: "medellin", ciudadNombre: "Medellín (sedes en todo el país)",
+    modalidad: "presencial", matricula: 12000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Corporación Universitaria Minuto de Dios (UNIMINUTO)", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C. (sedes en todo el país)",
+    modalidad: "virtual", matricula: 8000000, areas: ["Ingeniería","Administración y Negocios","Educación","Derecho y Ciencias Sociales"] },
+  { nombre: "Universidad Antonio Nariño", tipo: "privada", ciudad: "bogota", ciudadNombre: "Bogotá D.C. (sedes en todo el país)",
+    modalidad: "presencial", matricula: 10000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad Pontificia Bolivariana", tipo: "privada", ciudad: "medellin", ciudadNombre: "Medellín",
+    modalidad: "presencial", matricula: 20000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales","Arte y Diseño"] },
+  { nombre: "Universidad Militar Nueva Granada", tipo: "publica", ciudad: "bogota", ciudadNombre: "Bogotá D.C.",
+    modalidad: "presencial", matricula: 6000000, areas: ["Ingeniería","Ciencias y Matemáticas","Ciencias de la Salud","Administración y Negocios","Educación","Derecho y Ciencias Sociales"] }
+];
+
+// Programas ICETEX de financiación
+const BECAS_ICETEX = [
+  {
+    titulo: "Crédito Educativo ICETEX (Línea Tradicional)",
+    descripcion: "Crédito de largo plazo con tasa de interés preferencial para financiar matrícula y sostenimiento de programas de pregrado o posgrado en instituciones de educación superior aprobadas por el MEN.",
+    detalles: [
+      "Cobertura: Hasta el 100% del valor de la matrícula, según evaluación socioeconómica.",
+      "Pago: El estudiante empieza a pagar después de finalizar el programa (período de gracia).",
+      "Plazo: Hasta el doble del tiempo de duración del programa + 2 años de gracia.",
+      "Tasa: Subsidiada para estratos 1, 2 y 3; comercial para estratos superiores.",
+      "Requisitos: Ser colombiano, estar admitido en programa aprobado por el MEN, no reportar antecedentes disciplinarios."
+    ]
+  },
+  {
+    titulo: "Programa ACCES (Crédito Condonable)",
+    descripcion: "Crédito del Gobierno Nacional administrado por ICETEX que se condona (no se paga) si el estudiante se gradúa en el tiempo previsto y cumple los requisitos académicos. Orientado a estudiantes de bajos ingresos con buen rendimiento.",
+    detalles: [
+      "Cobertura: Hasta $5.000.000 por semestre (matrícula) + sostenimiento opcional.",
+      "Condonación: 100% si el estudiante se gradúa en el tiempo reglamentario.",
+      "Requisitos: Puntaje Sisbén IV en los rangos establecidos, presentar prueba de admisión o inscripción, mantener promedio académico mínimo.",
+      "Convocatoria: Generalmente abre entre septiembre y enero de cada año.",
+      "Beneficiarios: Estudiantes de estratos 1, 2 y 3 con mérito académico."
+    ]
+  },
+  {
+    titulo: "Beca Generación del Saber",
+    descripcion: "Beca-condonable del Gobierno Nacional para los mejores puntajes del ICFES (Saber 11). Reconoce la excelencia académica y financia estudios de pregrado en instituciones de educación superior.",
+    detalles: [
+      "Cobertura: Hasta $5.000.000 por semestre para matrícula.",
+      "Puntaje mínimo: Puntaje global superior a 360 (varía por convocatoria).",
+      "Duración: Hasta la finalización del programa académico, manteniendo promedio mínimo.",
+      "Requisitos: Estar dentro del 10% con mejor puntaje del ICFES a nivel nacional.",
+      "Condonación: 100% al graduarse en el tiempo previsto."
+    ]
+  },
+  {
+    titulo: "Beca-Condonoable para Población Víctima del Conflicto Armado",
+    descripcion: "Programa de crédito condonable dirigido a víctimas del conflicto armado inscritas en el Registro Único de Víctimas (RUV).",
+    detalles: [
+      "Cobertura: Hasta el 100% del valor de la matrícula.",
+      "Condonación: 100% al graduarse en el tiempo reglamentario.",
+      "Requisitos: Estar inscrito en el RUV, presentar carta de admisión de la institución.",
+      "Convocatoria: Anual, conforme a la disponibilidad de cupos."
+    ]
+  },
+  {
+    titulo: "Programa 'Ser Pilo Paga' (histórico / referencial)",
+    descripcion: "Aunque este programa cerró nuevas convocatorias, sigue siendo referencia para entender los modelos de beca-condonable por excelencia académica en Colombia. Cubría matrícula completa en universidades de alta calidad para los mejores puntajes del ICFES.",
+    detalles: [
+      "Cobertura: 100% de la matrícula en universidades de acreditación de alta calidad.",
+      "Condonación: 100% al graduarse en el tiempo reglamentario.",
+      "Estado: Sin convocatorias nuevas, pero los beneficiarios activos mantienen su cobertura.",
+      "Recomendación: Para estudiantes de excelencia, revisar becas equivalentes en cada universidad y los nuevos programas del MEN."
+    ]
+  },
+  {
+    titulo: "Crédito para Programas Técnicos, Tecnológicos y Complementarios",
+    descripcion: "Línea especial de ICETEX para financiar programas técnicos y tecnológicos en instituciones aprobadas por el MEN, con condiciones preferenciales para estudiantes de bajos ingresos.",
+    detalles: [
+      "Cobertura: Hasta el 100% del valor de la matrícula según evaluación.",
+      "Tasa: Subsidiada para estratos 1, 2 y 3.",
+      "Plazo: Hasta el doble de la duración del programa.",
+      "Requisitos: Admisión en institución aprobada, evaluación socioeconómica favorable."
+    ]
+  },
+  {
+    titulo: "Subsidio de Sostenimiento SAPIENCIA",
+    descripcion: "Apoyo económico mensual para gastos de transporte, alimentación y materiales, dirigido a estudiantes de bajos ingresos matriculados en instituciones públicas de educación superior.",
+    detalles: [
+      "Monto: Variable según convocatoria (generalmente entre $200.000 y $500.000 mensuales).",
+      "Requisitos: Estrato 1, 2 o 3, estar matriculado en IES pública, mantener promedio académico.",
+      "Cobertura: Durante el tiempo de duración del programa.",
+      "Gestión: A través de la IES pública correspondiente."
+    ]
+  }
+];
+
+/* =========================================================
+   ESTADO DE LA APLICACIÓN
+   ========================================================= */
+let respuestas = new Array(PREGUNTAS.length).fill(null);
+let datosEstudiante = {};
+let resultadosAreas = {};
+let topTresAreas = [];
+
+/* =========================================================
+   NAVEGACIÓN ENTRE SECCIONES
+   ========================================================= */
+function mostrarSeccion(idSeccion) {
+  document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+  document.getElementById(idSeccion).classList.add('activa');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* =========================================================
+   SECCIÓN 1 -> 2: INICIAR TEST
+   ========================================================= */
+function iniciarTest() {
+  const nombre = document.getElementById('nombre').value.trim();
+  const edad = document.getElementById('edad').value;
+  const ciudad = document.getElementById('ciudad').value;
+  const tipoUniv = document.getElementById('tipo-universidad').value;
+  const presupuesto = document.getElementById('presupuesto').value;
+  const modalidad = document.getElementById('modalidad').value;
+  const saber11 = document.getElementById('saber11').value;
+
+  if (!nombre || !edad || !ciudad || !presupuesto) {
+    mostrarAvisoError('seccion-datos', 'Por favor completa todos los campos obligatorios (*) antes de iniciar el test.');
+    return;
   }
 
-  function initParticles() {
-    particles = [];
-    const count = Math.min(140, Math.floor((canvas.width * canvas.height) / 11000));
-    for (let i = 0; i < count; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: -Math.random() * 0.4 - 0.05,
-        r: Math.random() * 1.5 + 0.3,
-        alpha: Math.random() * 0.5 + 0.2,
-        pulse: Math.random() * Math.PI * 2,
-        pulseSpeed: 0.012 + Math.random() * 0.02
-      });
-    }
+  datosEstudiante = {
+    nombre, edad, ciudad, tipoUniv, presupuesto, modalidad,
+    saber11: saber11 || 'No especificado',
+    fecha: new Date().toLocaleDateString('es-CO')
+  };
+
+  // Guardar en localStorage
+  localStorage.setItem('voc_datosEstudiante', JSON.stringify(datosEstudiante));
+
+  generarPreguntas();
+  mostrarSeccion('seccion-test');
+}
+
+/* =========================================================
+   GENERAR PREGUNTAS DEL TEST
+   ========================================================= */
+function generarPreguntas() {
+  const cont = document.getElementById('contenedor-preguntas');
+  cont.innerHTML = '';
+  const escalaLabels = {
+    1: "Nada me identifica",
+    2: "Me identifica poco",
+    3: "Me identifica parcialmente",
+    4: "Me identifica bastante",
+    5: "Me identifica totalmente"
+  };
+  PREGUNTAS.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'pregunta-bloque';
+    div.innerHTML = `
+      <div class="pregunta-numero">PREGUNTA ${i + 1} DE 70 · ÁREA: ${p.area.toUpperCase()}</div>
+      <div class="pregunta-texto">${p.texto}</div>
+      <div class="escala-opciones" data-pregunta="${i}">
+        ${[1,2,3,4,5].map(n => `
+          <div class="opcion" data-valor="${n}" onclick="seleccionarRespuesta(${i}, ${n}, this)">
+            <span class="numero">${n}</span>
+            ${escalaLabels[n]}
+          </div>
+        `).join('')}
+      </div>
+    `;
+    cont.appendChild(div);
+  });
+  actualizarProgreso();
+}
+
+function seleccionarRespuesta(preguntaIdx, valor, elem) {
+  respuestas[preguntaIdx] = valor;
+  // Quitar selección previa
+  const opciones = elem.parentElement.querySelectorAll('.opcion');
+  opciones.forEach(o => o.classList.remove('seleccionada'));
+  elem.classList.add('seleccionada');
+  actualizarProgreso();
+}
+
+function actualizarProgreso() {
+  const respondidas = respuestas.filter(r => r !== null).length;
+  const total = PREGUNTAS.length;
+  const pct = (respondidas / total) * 100;
+  document.getElementById('progreso-barra').style.width = pct + '%';
+  document.getElementById('progreso-texto').textContent = `Pregunta ${Math.min(respondidas + 1, total)} de ${total} · ${respondidas} respondidas`;
+  document.getElementById('btn-calcular').disabled = respondidas < total;
+}
+
+function volverADatos() { mostrarSeccion('seccion-datos'); }
+
+/* =========================================================
+   SECCIÓN 2 -> 3: CALCULAR RESULTADOS
+   ========================================================= */
+function calcularResultados() {
+  const faltantes = respuestas.filter(r => r === null).length;
+  if (faltantes > 0) {
+    mostrarAvisoError('seccion-test', `Te faltan ${faltantes} preguntas por responder.`);
+    return;
   }
 
-  function animateParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Sumar por área y calcular porcentaje (máx posible = 10 preguntas × 5 = 50 por área)
+  const sumas = {};
+  const maximos = {};
+  Object.keys(AREAS).forEach(a => { sumas[a] = 0; maximos[a] = 0; });
+  PREGUNTAS.forEach((p, i) => {
+    sumas[p.area] += respuestas[i];
+    maximos[p.area] += 5;
+  });
 
-    particles.forEach(p => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.pulse += p.pulseSpeed;
+  // Calcular porcentaje
+  resultadosAreas = {};
+  Object.keys(AREAS).forEach(a => {
+    resultadosAreas[a] = Math.round((sumas[a] / maximos[a]) * 100);
+  });
 
-      // Reciclar partículas que salen del canvas
-      if (p.y < -10) {
-        p.y = canvas.height + 10;
-        p.x = Math.random() * canvas.width;
-      }
-      if (p.x < -10) p.x = canvas.width + 10;
-      if (p.x > canvas.width + 10) p.x = -10;
+  // Ordenar y obtener top 3
+  topTresAreas = Object.keys(resultadosAreas)
+    .sort((a, b) => resultadosAreas[b] - resultadosAreas[a])
+    .slice(0, 3);
 
-      const alpha = p.alpha * (0.5 + Math.sin(p.pulse) * 0.5);
-      const radius = Math.max(0.1, p.r);
+  // Guardar en localStorage
+  localStorage.setItem('voc_resultados', JSON.stringify(resultadosAreas));
+  localStorage.setItem('voc_topTres', JSON.stringify(topTresAreas));
 
-      // Halo suave
-      const glowRadius = Math.max(0.5, radius * 4);
-      const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, glowRadius);
-      gradient.addColorStop(0, `rgba(244, 201, 105, ${alpha * 0.35})`);
-      gradient.addColorStop(1, 'rgba(244, 201, 105, 0)');
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, glowRadius, 0, Math.PI * 2);
-      ctx.fill();
+  mostrarResultados();
+  mostrarSeccion('seccion-resultados');
+}
 
-      // Núcleo
-      ctx.fillStyle = `rgba(244, 201, 105, ${alpha})`;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
-      ctx.fill();
+function mostrarResultados() {
+  // Resumen del estudiante
+  const ciudadTexto = document.querySelector(`#ciudad option[value="${datosEstudiante.ciudad}"]`).textContent;
+  const tipoTexto = { publica: 'Pública', privada: 'Privada', cualquiera: 'Cualquiera' }[datosEstudiante.tipoUniv];
+  const modTexto = { presencial: 'Presencial', virtual: 'Virtual', cualquiera: 'Cualquiera' }[datosEstudiante.modalidad];
+  document.getElementById('resultado-resumen').innerHTML = `
+    <h3>Resumen de tu evaluación</h3>
+    <div class="estudiante-info">
+      <div><strong>Estudiante:</strong> ${datosEstudiante.nombre}</div>
+      <div><strong>Edad:</strong> ${datosEstudiante.edad} años</div>
+      <div><strong>Fecha:</strong> ${datosEstudiante.fecha}</div>
+      <div><strong>Ciudad preferida:</strong> ${ciudadTexto}</div>
+      <div><strong>Tipo de universidad:</strong> ${tipoTexto}</div>
+      <div><strong>Modalidad:</strong> ${modTexto}</div>
+      <div><strong>Presupuesto anual:</strong> $${Number(datosEstudiante.presupuesto).toLocaleString('es-CO')}</div>
+      <div><strong>Puntaje Saber 11:</strong> ${datosEstudiante.saber11}</div>
+    </div>
+  `;
+
+  // Top 3 áreas con carreras
+  const topCont = document.getElementById('top-areas');
+  topCont.innerHTML = '';
+  topTresAreas.forEach((area, idx) => {
+    topCont.appendChild(crearAreaCard(area, idx < 3));
+  });
+
+  // Todas las áreas
+  const todasCont = document.getElementById('todas-areas');
+  todasCont.innerHTML = '';
+  Object.keys(resultadosAreas)
+    .sort((a, b) => resultadosAreas[b] - resultadosAreas[a])
+    .forEach(area => {
+      todasCont.appendChild(crearAreaCard(area, false, true));
     });
+}
 
-    requestAnimationFrame(animateParticles);
+function crearAreaCard(area, esTop, esCompacto = false) {
+  const div = document.createElement('div');
+  div.className = 'area-resultado' + (esTop ? ' top' : '');
+  const porcentaje = resultadosAreas[area];
+  const carreras = AREAS[area].carreras;
+  const carrerasHTML = esCompacto
+    ? `<div class="uni-carreras">Carreras: ${carreras.slice(0, 5).join(' · ')}${carreras.length > 5 ? '...' : ''}</div>`
+    : `<ul class="carreras-lista">${carreras.map(c => `<li>${c}</li>`).join('')}</ul>`;
+  div.innerHTML = `
+    <div class="area-header">
+      <span class="area-nombre">${area}</span>
+      <span class="area-porcentaje">${porcentaje}%</span>
+    </div>
+    <div class="barra-afinidad"><div style="width:${porcentaje}%"></div></div>
+    ${carrerasHTML}
+  `;
+  return div;
+}
+
+function reiniciarTest() {
+  if (!confirm('¿Seguro que quieres repetir el test? Se borrarán tus respuestas actuales.')) return;
+  respuestas = new Array(PREGUNTAS.length).fill(null);
+  generarPreguntas();
+  mostrarSeccion('seccion-test');
+}
+
+function irAUniversidades() {
+  // Pre-cargar filtros con las preferencias del estudiante
+  document.getElementById('filtro-area').value = topTresAreas[0] || '';
+  document.getElementById('filtro-ciudad').value = datosEstudiante.ciudad === 'cualquiera' ? '' : datosEstudiante.ciudad;
+  document.getElementById('filtro-tipo').value = datosEstudiante.tipoUniv === 'cualquiera' ? '' : datosEstudiante.tipoUniv;
+  document.getElementById('filtro-modalidad').value = datosEstudiante.modalidad === 'cualquiera' ? '' : datosEstudiante.modalidad;
+  document.getElementById('filtro-presupuesto').value = datosEstudiante.presupuesto;
+  buscarUniversidades();
+  mostrarSeccion('seccion-universidades');
+}
+
+/* =========================================================
+   SECCIÓN 4: BUSCAR UNIVERSIDADES
+   ========================================================= */
+function buscarUniversidades() {
+  const fArea = document.getElementById('filtro-area').value;
+  const fCiudad = document.getElementById('filtro-ciudad').value;
+  const fTipo = document.getElementById('filtro-tipo').value;
+  const fModalidad = document.getElementById('filtro-modalidad').value;
+  const fPresupuesto = document.getElementById('filtro-presupuesto').value;
+
+  let resultados = UNIVERSIDADES.filter(u => {
+    if (fArea && !u.areas.includes(fArea)) return false;
+    if (fCiudad && u.ciudad !== fCiudad) return false;
+    if (fTipo && u.tipo !== fTipo) return false;
+    if (fModalidad && u.modalidad !== fModalidad) return false;
+    if (fPresupuesto && u.matricula > Number(fPresupuesto)) return false;
+    return true;
+  });
+
+  const cont = document.getElementById('contenedor-universidades');
+  if (resultados.length === 0) {
+    cont.innerHTML = `<div class="no-resultados">
+      <p>No se encontraron universidades con los filtros seleccionados.</p>
+      <p>Intenta ampliar tus criterios de búsqueda (por ejemplo, quitar el filtro de ciudad o aumentar el presupuesto).</p>
+    </div>`;
+    return;
   }
 
-  window.addEventListener('resize', () => {
-    resizeCanvas();
-    initParticles();
-  });
+  cont.innerHTML = `<div class="aviso exito">
+    Se encontraron <strong>${resultados.length}</strong> universidades que coinciden con tus criterios.
+  </div>` + resultados.map(u => crearUniversidadCard(u, fArea)).join('');
+}
 
-  resizeCanvas();
-  initParticles();
-  animateParticles();
+function crearUniversidadCard(u, areaSeleccionada) {
+  const carrerasMostrar = areaSeleccionada ? AREAS[areaSeleccionada].carreras : u.areas.flatMap(a => AREAS[a].carreras).slice(0, 6);
+  const carrerasTexto = (areaSeleccionada ? carrerasMostrar : carrerasMostrar).slice(0, 6).join(', ');
+  return `
+    <div class="universidad-card ${u.tipo}">
+      <div class="uni-header">
+        <div class="uni-nombre">${u.nombre}</div>
+        <div>
+          <span class="badge ${u.tipo}">${u.tipo === 'publica' ? 'PÚBLICA' : 'PRIVADA'}</span>
+          <span class="badge modalidad">${u.modalidad.toUpperCase()}</span>
+        </div>
+      </div>
+      <div class="uni-detalles"><strong>Ciudad:</strong> ${u.ciudadNombre}</div>
+      <div class="uni-detalles"><strong>Matrícula anual aproximada:</strong> $${u.matricula.toLocaleString('es-CO')} COP</div>
+      <div class="uni-detalles"><strong>Áreas atendidas:</strong> ${u.areas.join(', ')}</div>
+      <div class="uni-carreras"><strong>Carreras destacadas:</strong> ${carrerasTexto}${u.areas.length * 10 > carrerasMostrar.length ? '...' : ''}</div>
+    </div>
+  `;
+}
 
-  // Animaciones de revelado al hacer scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+function limpiarFiltros() {
+  document.getElementById('filtro-area').value = '';
+  document.getElementById('filtro-ciudad').value = '';
+  document.getElementById('filtro-tipo').value = '';
+  document.getElementById('filtro-modalidad').value = '';
+  document.getElementById('filtro-presupuesto').value = '';
+  buscarUniversidades();
+}
 
-  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+function irABecas() {
+  generarBecas();
+  mostrarSeccion('seccion-becas');
+}
 
-  // Retardo escalonado en grids para efecto cascada
-  document.querySelectorAll('.timeline-grid, .importance-grid').forEach(grid => {
-    const cards = grid.querySelectorAll('.reveal');
-    cards.forEach((card, i) => {
-      card.style.transitionDelay = `${(i % 4) * 0.08}s`;
-    });
-  });
+/* =========================================================
+   SECCIÓN 5: BECAS ICETEX
+   ========================================================= */
+function generarBecas() {
+  const cont = document.getElementById('contenedor-becas');
+  cont.innerHTML = BECAS_ICETEX.map(b => `
+    <div class="beca-card">
+      <h4>${b.titulo}</h4>
+      <p>${b.descripcion}</p>
+      <ul>
+        ${b.detalles.map(d => `<li>${d}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+/* =========================================================
+   AVISOS
+   ========================================================= */
+function mostrarAvisoError(idSeccion, mensaje) {
+  const seccion = document.getElementById(idSeccion);
+  let aviso = seccion.querySelector('.aviso.error');
+  if (aviso) aviso.remove();
+  aviso = document.createElement('div');
+  aviso.className = 'aviso error';
+  aviso.textContent = mensaje;
+  seccion.insertBefore(aviso, seccion.querySelector('h3, .form-grid, .progreso-contenedor'));
+  setTimeout(() => aviso.remove(), 5000);
+}
+
+/* =========================================================
+   EXPORTAR A PDF (USANDO window.print())
+   ========================================================= */
+function generarReportePDF() {
+  // Hacer visibles todas las secciones para impresión
+  document.querySelectorAll('.seccion').forEach(s => s.classList.add('activa'));
+
+  // Mostrar un aviso breve antes de imprimir
+  setTimeout(() => {
+    window.print();
+    // Restaurar: solo la sección de becas queda activa
+    setTimeout(() => {
+      document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+      document.getElementById('seccion-becas').classList.add('activa');
+    }, 500);
+  }, 300);
+}
+
+/* =========================================================
+   AL INICIO: RECUPERAR DATOS GUARDADOS (SI EXISTEN)
+   ========================================================= */
+window.addEventListener('DOMContentLoaded', () => {
+  const datosGuardados = localStorage.getItem('voc_datosEstudiante');
+  if (datosGuardados) {
+    const d = JSON.parse(datosGuardados);
+    document.getElementById('nombre').value = d.nombre || '';
+    document.getElementById('edad').value = d.edad || '';
+    if (d.ciudad) document.getElementById('ciudad').value = d.ciudad;
+    if (d.tipoUniv) document.getElementById('tipo-universidad').value = d.tipoUniv;
+    if (d.presupuesto) document.getElementById('presupuesto').value = d.presupuesto;
+    if (d.modalidad) document.getElementById('modalidad').value = d.modalidad;
+    if (d.saber11 && d.saber11 !== 'No especificado') document.getElementById('saber11').value = d.saber11;
+  }
+  generarPreguntas();
+});
 </script>
 </body>
 </html>
